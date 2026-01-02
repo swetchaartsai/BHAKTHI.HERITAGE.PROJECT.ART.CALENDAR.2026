@@ -88,31 +88,37 @@
         }
         .gate-btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
 
-        /* --- CHAPTER 2: THE MAP (Full Screen Portal) --- */
+        /* --- CHAPTER 2: THE MAP --- */
         #chapter-2 {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #fdf5e6; z-index: 20000;
+            background: #4a0404; /* Dark background for the outer frame */
+            z-index: 20000;
             display: flex; flex-direction: column;
+            padding: 15px; /* THE FRAME PADDING to prevent cutting */
         }
 
         /* Mobile Forced Landscape Logic */
         @media (max-width: 768px) and (orientation: portrait) {
             #chapter-2 {
-                width: 100vh; height: 100vw; /* Swap Dimensions */
-                top: 50%; left: 50%; /* Center pivot */
-                transform: translate(-50%, -50%) rotate(90deg); /* Rotate around center */
+                width: 100vh; height: 100vw; 
+                top: 50%; left: 50%; 
+                transform: translate(-50%, -50%) rotate(90deg); 
+                padding: 10px; /* Slightly smaller frame on mobile */
             }
         }
 
-        .map-nav {
-            height: 60px; background: var(--maroon); color: var(--gold);
-            display: flex; justify-content: center; align-items: center; 
-            flex-shrink: 0; border-bottom: 2px solid var(--gold);
+        .map-frame-container {
+            flex: 1;
+            display: flex;
+            background: #fff;
+            border: 4px solid var(--gold); /* The Visible Frame */
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border-radius: 8px;
         }
-        .map-body { flex: 1; display: flex; overflow: hidden; }
-        
-        /* --- LAYOUT CONFIGURATION --- */
-        /* Sidebar on the Left, Map on the Right */
+
+        /* Map Left, Sidebar Right */
+        #map { flex: 1.8; height: 100%; background: #ddd; z-index: 1; }
         
         #sidebar { 
             flex: 1; 
@@ -120,22 +126,15 @@
             max-width: 400px; 
             padding: 20px; 
             background: #fdf5e6 url('https://www.transparenttextures.com/patterns/paper-fibers.png'); 
-            border-right: 2px solid var(--gold); /* Border separates Sidebar from Map */
+            border-left: 3px solid var(--gold); /* Border separates Sidebar from Map */
             display: flex; 
-            flex-direction: column; /* Allows button to sit at bottom */
+            flex-direction: column; 
             z-index: 2;
-        }
-
-        #map { 
-            flex: 1.8; 
-            height: 100%; 
-            background: #ddd; 
-            z-index: 1; 
         }
 
         /* Sidebar Internal Layout */
         #search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--gold); font-family: 'Lora'; font-size: 1rem; }
-        #info-panel { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } /* Scrollable area */
+        #info-panel { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } 
         
         /* Continue Button at Bottom of Sidebar */
         .continue-box {
@@ -242,10 +241,8 @@
     </div>
 
     <div id="chapter-2" class="hidden">
-        <div class="map-nav">
-            <div style="font-family:'Cinzel'; font-size:1.1rem;" data-i18n="gate_title">The Sacred Map</div>
-        </div>
-        <div class="map-body">
+        <div class="map-frame-container">
+            <div id="map"></div>
             
             <div id="sidebar">
                 <input type="text" id="search-box" placeholder="Search / खोज / ಹುಡುಕಿ / వెతకండి..." onkeyup="searchSaint()">
@@ -262,8 +259,6 @@
                     </button>
                 </div>
             </div>
-
-            <div id="map"></div>
         </div>
     </div>
 
@@ -514,7 +509,7 @@
                 name: { en: 'Madhvacharya', hi: 'मध्वाचार्य', kn: 'ಮಧ್ವಾಚಾರ್ಯ', te: 'మధ్వాచార్య' },
                 bio: { en: "Founder of Dualism. Established the Ashta Mathas of Udupi and popularized Krishna worship.", hi: "द्वैतवाद के संस्थापक। उडुपी के अष्ट मठों की स्थापना की।", kn: "ದ್ವೈತ ಸಿದ್ಧಾಂತದ ಸ್ಥಾಪಕರು. ಉಡುಪಿಯಲ್ಲಿ ಅಷ್ಟ ಮಠಗಳನ್ನು ಸ್ಥಾಪಿಸಿದರು.", te: "ద్వైత సిద్ధాంత స్థాపకులు. ఉడిపిలో అష్ట మఠాలను స్థాపించారు." },
                 work: { en: "Dvaita", hi: "द्वैत", kn: "ದ್ವೈತ", te: "ద్వైత" },
-                impact: { en: "Krishna Bhakti in Karnataka.", hi: "कृष्ण भक्ति", kn: "ಕೃಷ್ಣ ಭಕ್ತಿ", te: "కృష్ణ ಭಕ್ತಿ" },
+                impact: { en: "Krishna Bhakti in Karnataka.", hi: "कृष्ण भक्ति", kn: "ಕೃಷ್ಣ ಭಕ್ತಿ", te: "ಕೃಷ್ಣ ಭಕ್ತಿ" },
                 fact: { en: "Founder of Udupi Matha.", hi: "उडुपी मठ संस्थापक", kn: "ಉಡುಪಿ ಮಠ ಸ್ಥಾಪಕರು", te: "ఉడిపి మఠ స్థాపకులు" },
                 dyk: { en: "Possessed immense physical strength.", hi: "अत्यंत बलशाली थे।", kn: "ಅಪಾರ ದೈಹಿಕ ಶಕ್ತಿ ಹೊಂದಿದ್ದರು.", te: "గొప్ప శారీరక బలం కలవారు." }
             },
@@ -523,13 +518,13 @@
                 bio: { en: "Social reformer who founded the Lingayat movement. Preached 'Work is Worship' and established Anubhava Mantapa.", hi: "लिंगायत आंदोलन के संस्थापक। 'कर्म ही पूजा है' का उपदेश दिया।", kn: "ಲಿಂಗಾಯತ ಧರ್ಮದ ಸ್ಥಾಪಕರು. 'ಕಾಯಕವೇ ಕೈಲಾಸ' ಎಂದು ಬೋಧಿಸಿದರು.", te: "లింగాయత ఉద్యమ స్థాపకులు. 'పనే దైవం' అని బోధించారు." },
                 work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "ವಚನ" },
                 impact: { en: "Abolished caste hierarchy.", hi: "समाज सुधारक।", kn: "ಸಮಾಜ ಸುಧಾರಕ.", te: "సామాజిక సంస్కర్త." },
-                fact: { en: "Established Anubhava Mantapa.", hi: "अनुभव मंटप।", kn: "ಅನುಭವ ಮಂಟಪ.", te: "అనుభవ మంటపం." },
+                fact: { en: "Established Anubhava Mantapa.", hi: "अनुभव मंटप।", kn: "ಅನುಭವ ಮಂಟಪ.", te: "ಅನುಭವ ಮಂಟಪ." },
                 dyk: { en: "Said the human body is a moving temple.", hi: "शरीर ही मंदिर है।", kn: "ದೇಹವೇ ದೇಗುಲ.", te: "శరీరమే దేవాలయం." }
             },
             'akka': {
                 name: { en: 'Akka Mahadevi', hi: 'अक्का महादेवी', kn: 'ಅಕ್ಕ ಮಹಾದೇವಿ', te: 'అక్క మహాదేవి' },
                 bio: { en: "A female mystic who renounced the world for Shiva. She wandered as an ascetic.", hi: "एक महिला संत जिन्होंने शिव के लिए संसार त्याग दिया।", kn: "ಶಿವನಿಗಾಗಿ ಸಂಸಾರ ತ್ಯಜಿಸಿದ ಶರಣೆ.", te: "శివుని కోసం ప్రపంచాన్ని త్యజించిన యోగిని." },
-                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "వచన" },
+                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "ವಚನ" },
                 impact: { en: "Female empowerment in spirituality.", hi: "महिला सशक्तिकरण।", kn: "ಮಹಿಳಾ ಸಬಲೀಕರಣ.", te: "మహిళా సాధికారత." },
                 fact: { en: "Wore only her hair.", hi: "केशों से शरीर ढका।", kn: "ಕೂದಲೇ ವಸ್ತ್ರವಾಗಿತ್ತು.", te: "జుట్టుతో శరీరాన్ని కప్పుకున్నారు." },
                 dyk: { en: "Considered Shiva as her husband 'Chenna Mallikarjuna'.", hi: "शिव को अपना पति माना।", kn: "ಚನ್ನಮಲ್ಲಿಕಾರ್ಜುನನೇ ಪತಿ ಎಂದು ನಂಬಿದ್ದರು.", te: "చెన్నమల్లికార్జునుడిని భర్తగా భావించారు." }
@@ -538,7 +533,7 @@
                 name: { en: 'Tyagaraja', hi: 'त्यागराज', kn: 'ತ್ಯಾಗರಾಜ', te: 'త్యాగరాజు' },
                 bio: { en: "Greatest Rama devotee in music. Renounced wealth to sing thousands of divine melodies.", hi: "संगीत में राम के सबसे बड़े भक्त। धन का त्याग किया।", kn: "ಕರ್ನಾಟಕ ಸಂಗೀತದ ಶ್ರೇಷ್ಠ ರಾಮ ಭಕ್ತರು.", te: "సంగీత సంప్రదాయంలో గొప్ప రామ భక్తుడు." },
                 work: { en: "Pancharatna Kritis", hi: "पंचरत्न", kn: "ಪಂಚರತ್ನ", te: "పంచరత్న" },
-                impact: { en: "Music Trinity.", hi: "संगीत त्रिमूर्ति", kn: "ಸಂಗೀತ ತ್ರಿಮೂರ್ತಿ", te: "సంగీత త్రిమూర్తులు" },
+                impact: { en: "Music Trinity.", hi: "संगीत त्रिमूर्ति", kn: "ಸಂಗೀತ ತ್ರಿಮೂರ್ತಿ", te: "సంగీత ತ్రిమూర్తులు" },
                 fact: { en: "Saw Rama in person.", hi: "राम दर्शन।", kn: "ರಾಮ ದರ್ಶನ.", te: "రామ దర్శనం." },
                 dyk: { en: "Saw Rama while singing 'Bhavanutha'.", hi: "गाते समय राम को देखा।", kn: "ಹಾಡುವಾಗ ರಾಮನಿಗಾಗಿ ಕಂಡರು.", te: "పాడుతుండగా రాముడు కనిపించాడు." }
             },
@@ -569,10 +564,10 @@
             'kanaka': {
                 name: { en: 'Kanaka Dasa', hi: 'कनक दास', kn: 'ಕನಕ ದಾಸ', te: 'కనక దాసు' },
                 bio: { en: "Soldier turned saint. Proved devotion is above caste.", hi: "सैनिक से संत बने।", kn: "ಸೈನಿಕನಾಗಿದ್ದು ಸಂತನಾದರು.", te: "సైనికుడిగా ఉండి సంతుగా మారారు." },
-                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీರ್తనలు" },
+                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీర్తనలు" },
                 impact: { en: "Social equality.", hi: "सामाजिक समानता।", kn: "ಸಾಮಾಜಿಕ ಸಮಾನತೆ.", te: "సామాజిక సమానత్వం." },
                 fact: { en: "Idol turned to give him Darshan.", hi: "मूर्ति ने मुड़कर दर्शन दिए।", kn: "ವಿಗ್ರಹವೇ ತಿರುಗಿ ದರ್ಶನ ನೀಡಿತು.", te: "విగ్రహమే తిరిగి దర్శనమిచ్చింది." },
-                dyk: { en: "The window 'Kanakana Kindi' still exists.", hi: "कनकन खिंडी आज भी है।", kn: "ಕನಕನ ಕಿಂಡಿ ಇಂದಿಗೂ ಇದೆ.", te: "ಕನಕನ ಕಿಂಡಿ ఇప్పటికీ ఉంది." }
+                dyk: { en: "The window 'Kanakana Kindi' still exists.", hi: "कनकन खिंडी आज भी है।", kn: "ಕನಕನ ಕಿಂಡಿ ಇಂದಿಗೂ ಇದೆ.", te: "ಕನకನ ಕಿಂಡಿ ఇప్పటికీ ఉంది." }
             },
             'ramadasu': {
                 name: { en: 'Ramadasu', hi: 'रामदास', kn: 'ರಾಮದಾಸ', te: 'రామదాసు' },
@@ -720,7 +715,7 @@
             },
             'jayadeva': {
                 name: { en: 'Jayadeva', hi: 'जयदेव', kn: 'ಜಯದೇವ', te: 'జయదేవ' },
-                bio: { en: "Sanskrit poet. Wrote Gita Govinda.", hi: "संस्कृत कवि। गीत गोविंद लिखा।", kn: "ಸಂಸ್ಕೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದ ರಚಿಸಿದರು.", te: "సంస్కೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದಂ రాశారు." },
+                bio: { en: "Sanskrit poet. Wrote Gita Govinda.", hi: "संस्कृत कवि। गीत गोविंद लिखा।", kn: "ಸಂಸ್ಕೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದ ರಚಿಸಿದರು.", te: "సంస్కೃತ కವಿ. ಗೀತ ಗೋವಿಂದಂ రాశారు." },
                 work: { en: "Gita Govinda", hi: "गीत गोविंद", kn: "ಗೀತ ಗೋವಿಂದ", te: "గీత గోవిందం" },
                 impact: { en: "Odissi Dance music.", hi: "ओडिसी संगीत।", kn: "ಒಡಿಸ್ಸಿ ಸಂಗೀತ.", te: "ఒడిస్సీ సంగీతం." },
                 fact: { en: "Krishna completed his verse.", hi: "कृष्ण ने उनका श्लोक पूरा किया।", kn: "ಕೃಷ್ಣನೇ ಇವರ ಶ್ಲೋಕ ಪೂರ್ಣಗೊಳಿಸಿದನು.", te: "కృష్ణుడే వీరి శ్లోకాన్ని పూర్తి చేశాడు." },
@@ -737,7 +732,7 @@
             'lalded': {
                 name: { en: 'Lal Ded', hi: 'लल डेड', kn: 'ಲಲ್ ಡೇಡ್', te: 'లల్ దేడ్' },
                 bio: { en: "Kashmiri mystic. Preached Shaivism.", hi: "कश्मीरी कवयित्री। शैव धर्म का प्रचार किया।", kn: "ಕಾಶ್ಮೀರಿ ಯೋಗಿನಿ. ಶೈವ ಧರ್ಮ ಬೋಧಿಸಿದರು.", te: "కాశ్మీరీ యోగిని. శైవ మతం బోధించారు." },
-                work: { en: "Vakhs", hi: "वाख", kn: "ವಾಖ್", te: "వాఖ్" },
+                work: { en: "Vakhs", hi: "वाख", kn: "ವಾಖ್", te: "ವಾಖ್" },
                 impact: { en: "Kashmiri culture.", hi: "कश्मीरी संस्कृति।", kn: "ಕಾಶ್ಮೀರಿ ಸಂಸ್ಕೃತಿ.", te: "కాశ్మీరీ సంస్కృతి." },
                 fact: { en: "Roamed naked like Akka Mahadevi.", hi: "अक्का महादेवी की तरह वस्त्रहीन रहीं।", kn: "ಅಕ್ಕ ಮಹಾದೇವಿಯಂತೆ ದಿಗಂಬರೆಯಾಗಿದ್ದರು.", te: "అక్క మహాదేవిలా వస్త్రాలు విడిచిపెట్టారు." },
                 dyk: { en: "Revered by Hindus and Muslims.", hi: "हिंदू और मुस्लिम दोनों मानते हैं।", kn: "ಹಿಂದೂ ಮತ್ತು ಮುಸ್ಲಿಮರು ಗೌರವಿಸುತ್ತಾರೆ.", te: "హిందువులు, ముస్లింలు ఇద్దరూ గౌరవిస్తారు." }
