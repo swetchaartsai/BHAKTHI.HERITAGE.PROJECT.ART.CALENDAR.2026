@@ -111,19 +111,31 @@
         }
         .map-body { flex: 1; display: flex; overflow: hidden; }
         
-        /* Layout: Map Left, Sidebar Right */
-        #map { flex: 1.8; height: 100%; background: #ddd; z-index: 1; }
+        /* --- LAYOUT CONFIGURATION --- */
+        /* Sidebar on the Left, Map on the Right */
         
         #sidebar { 
-            flex: 1; min-width: 320px; max-width: 400px; padding: 20px; 
+            flex: 1; 
+            min-width: 320px; 
+            max-width: 400px; 
+            padding: 20px; 
             background: #fdf5e6 url('https://www.transparenttextures.com/patterns/paper-fibers.png'); 
-            border-left: 2px solid var(--gold); /* Border on the left */
-            display: flex; flex-direction: column; /* For vertical layout of sidebar */
+            border-right: 2px solid var(--gold); /* Border separates Sidebar from Map */
+            display: flex; 
+            flex-direction: column; /* Allows button to sit at bottom */
+            z-index: 2;
+        }
+
+        #map { 
+            flex: 1.8; 
+            height: 100%; 
+            background: #ddd; 
+            z-index: 1; 
         }
 
         /* Sidebar Internal Layout */
         #search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--gold); font-family: 'Lora'; font-size: 1rem; }
-        #info-panel { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } /* Allows scrolling for content */
+        #info-panel { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; } /* Scrollable area */
         
         /* Continue Button at Bottom of Sidebar */
         .continue-box {
@@ -234,7 +246,6 @@
             <div style="font-family:'Cinzel'; font-size:1.1rem;" data-i18n="gate_title">The Sacred Map</div>
         </div>
         <div class="map-body">
-            <div id="map"></div>
             
             <div id="sidebar">
                 <input type="text" id="search-box" placeholder="Search / खोज / ಹುಡುಕಿ / వెతకండి..." onkeyup="searchSaint()">
@@ -251,6 +262,8 @@
                     </button>
                 </div>
             </div>
+
+            <div id="map"></div>
         </div>
     </div>
 
@@ -485,7 +498,7 @@
                     te: "ఏకైక మహిళా ఆల్వార్. ఆండాళ్ శ్రీమహావిష్ణువును తన ప్రియుడిగా భావించి, తన తమిళ కవిత్వం ద్వారా మధుర భక్తిని చాటారు."
                 },
                 work: { en: "Thiruppavai", hi: "तिरुप्पवै", kn: "ತಿರುಪ್ಪಾವೈ", te: "తిరుప్పావై" },
-                impact: { en: "Her verses are the backbone of Margazhi prayers.", hi: "विवाह रहस्यवाद।", kn: "ಮಧುರ ಭಕ್ತಿ.", te: "ಮಧುರ ಭಕ್ತಿ." },
+                impact: { en: "Her verses are the backbone of Margazhi prayers.", hi: "विवाह रहस्यवाद।", kn: "ಮಧುರ ಭಕ್ತಿ.", te: "మధుర భక్తి." },
                 fact: { en: "She merged into the deity of Lord Ranganatha.", hi: "एकमात्र महिला आलवार।", kn: "ಏಕೈಕ ಮಹಿಳಾ ಆಳ್ವಾರ್.", te: "ఏకైక మహిళా ఆల్వార్." },
                 dyk: { en: "She secretly wore the deity's garlands before they were offered.", hi: "वह भगवान की मालाएँ पहले खुद पहन लेती थीं।", kn: "ದೇವರಿಗೆ ಅರ್ಪಿಸುವ ಹೂಮಾಲೆಯನ್ನು ತಾನು ಧರಿಸುತ್ತಿದ್ದರು.", te: "స్వామికి సమర్పించాల్సిన పూలమాలలను ముందుగా తాను ధరించేవారు." }
             },
@@ -501,14 +514,14 @@
                 name: { en: 'Madhvacharya', hi: 'मध्वाचार्य', kn: 'ಮಧ್ವಾಚಾರ್ಯ', te: 'మధ్వాచార్య' },
                 bio: { en: "Founder of Dualism. Established the Ashta Mathas of Udupi and popularized Krishna worship.", hi: "द्वैतवाद के संस्थापक। उडुपी के अष्ट मठों की स्थापना की।", kn: "ದ್ವೈತ ಸಿದ್ಧಾಂತದ ಸ್ಥಾಪಕರು. ಉಡುಪಿಯಲ್ಲಿ ಅಷ್ಟ ಮಠಗಳನ್ನು ಸ್ಥಾಪಿಸಿದರು.", te: "ద్వైత సిద్ధాంత స్థాపకులు. ఉడిపిలో అష్ట మఠాలను స్థాపించారు." },
                 work: { en: "Dvaita", hi: "द्वैत", kn: "ದ್ವೈತ", te: "ద్వైత" },
-                impact: { en: "Krishna Bhakti in Karnataka.", hi: "कृष्ण भक्ति", kn: "ಕೃಷ್ಣ ಭಕ್ತಿ", te: "కృష్ణ భక్తి" },
+                impact: { en: "Krishna Bhakti in Karnataka.", hi: "कृष्ण भक्ति", kn: "ಕೃಷ್ಣ ಭಕ್ತಿ", te: "కృష్ణ ಭಕ್ತಿ" },
                 fact: { en: "Founder of Udupi Matha.", hi: "उडुपी मठ संस्थापक", kn: "ಉಡುಪಿ ಮಠ ಸ್ಥಾಪಕರು", te: "ఉడిపి మఠ స్థాపకులు" },
                 dyk: { en: "Possessed immense physical strength.", hi: "अत्यंत बलशाली थे।", kn: "ಅಪಾರ ದೈಹಿಕ ಶಕ್ತಿ ಹೊಂದಿದ್ದರು.", te: "గొప్ప శారీరక బలం కలవారు." }
             },
             'basavanna': {
                 name: { en: 'Basavanna', hi: 'बसवन्ना', kn: 'ಬಸವಣ್ಣ', te: 'బసవన్న' },
                 bio: { en: "Social reformer who founded the Lingayat movement. Preached 'Work is Worship' and established Anubhava Mantapa.", hi: "लिंगायत आंदोलन के संस्थापक। 'कर्म ही पूजा है' का उपदेश दिया।", kn: "ಲಿಂಗಾಯತ ಧರ್ಮದ ಸ್ಥಾಪಕರು. 'ಕಾಯಕವೇ ಕೈಲಾಸ' ಎಂದು ಬೋಧಿಸಿದರು.", te: "లింగాయత ఉద్యమ స్థాపకులు. 'పనే దైవం' అని బోధించారు." },
-                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "వచన" },
+                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "ವಚನ" },
                 impact: { en: "Abolished caste hierarchy.", hi: "समाज सुधारक।", kn: "ಸಮಾಜ ಸುಧಾರಕ.", te: "సామాజిక సంస్కర్త." },
                 fact: { en: "Established Anubhava Mantapa.", hi: "अनुभव मंटप।", kn: "ಅನುಭವ ಮಂಟಪ.", te: "అనుభవ మంటపం." },
                 dyk: { en: "Said the human body is a moving temple.", hi: "शरीर ही मंदिर है।", kn: "ದೇಹವೇ ದೇಗುಲ.", te: "శరీరమే దేవాలయం." }
@@ -517,7 +530,7 @@
                 name: { en: 'Akka Mahadevi', hi: 'अक्का महादेवी', kn: 'ಅಕ್ಕ ಮಹಾದೇವಿ', te: 'అక్క మహాదేవి' },
                 bio: { en: "A female mystic who renounced the world for Shiva. She wandered as an ascetic.", hi: "एक महिला संत जिन्होंने शिव के लिए संसार त्याग दिया।", kn: "ಶಿವನಿಗಾಗಿ ಸಂಸಾರ ತ್ಯಜಿಸಿದ ಶರಣೆ.", te: "శివుని కోసం ప్రపంచాన్ని త్యజించిన యోగిని." },
                 work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "వచన" },
-                impact: { en: "Female empowerment in spirituality.", hi: "महिला सशक्तिकरण।", kn: "ಮಹಿಳಾ ಸಬಲೀಕರಣ.", te: "ಮಹಿಳಾ ಸಬಲೀಕರಣ." },
+                impact: { en: "Female empowerment in spirituality.", hi: "महिला सशक्तिकरण।", kn: "ಮಹಿಳಾ ಸಬಲೀಕರಣ.", te: "మహిళా సాధికారత." },
                 fact: { en: "Wore only her hair.", hi: "केशों से शरीर ढका।", kn: "ಕೂದಲೇ ವಸ್ತ್ರವಾಗಿತ್ತು.", te: "జుట్టుతో శరీరాన్ని కప్పుకున్నారు." },
                 dyk: { en: "Considered Shiva as her husband 'Chenna Mallikarjuna'.", hi: "शिव को अपना पति माना।", kn: "ಚನ್ನಮಲ್ಲಿಕಾರ್ಜುನನೇ ಪತಿ ಎಂದು ನಂಬಿದ್ದರು.", te: "చెన్నమల్లికార్జునుడిని భర్తగా భావించారు." }
             },
@@ -541,7 +554,7 @@
                 name: { en: 'Nammalvar', hi: 'नम्मालवार', kn: 'ನಮ್ಮಾಳ್ವಾರ್', te: 'నమ్మాళ్వార్' },
                 bio: { en: "Spent 16 years in meditation in a hollow tree without speaking.", hi: "16 साल तक एक पेड़ के अंदर मौन तपस्या की।", kn: "16 ವರ್ಷ ಮರದ ಪೊಟರೆಯಲ್ಲಿ ಧ್ಯಾನ ಮಾಡಿದರು.", te: "16 ఏళ్లు చెట్టు తొర్రలో ధ్యానం చేశారు." },
                 work: { en: "Tiruvaymoli", hi: "तिरुवायमोली", kn: "ತಿರುವಾಯ್ಮೊಳಿ", te: "తిరువాయ్ మొళి" },
-                impact: { en: "Works called Tamil Veda.", hi: "तमिल वेद।", kn: "ತಮಿಳು ವೇದ.", te: "తమిళ వేదం." },
+                impact: { en: "Works called Tamil Veda.", hi: "तमिल वेद।", kn: "ತಮಿಳು ವೇದ.", te: "తಮಿళ వేదం." },
                 fact: { en: "Chief of the Alvars.", hi: "आलवारों के प्रमुख।", kn: "ಆಳ್ವಾರರಲ್ಲಿ ಪ್ರಮುಖರು.", te: "ఆళ్వార్లలో ముఖ్యులు." },
                 dyk: { en: "Never opened his eyes to the world.", hi: "दुनिया के लिए कभी आँखें नहीं खोलीं।", kn: "ಲೌಕಿಕ ಜಗತ್ತಿಗೆ ಕಣ್ಣು ತೆರೆಯಲಿಲ್ಲ.", te: "ప్రపంచాన్ని చూడటానికి కళ్లు తెరవలేదు." }
             },
@@ -556,10 +569,10 @@
             'kanaka': {
                 name: { en: 'Kanaka Dasa', hi: 'कनक दास', kn: 'ಕನಕ ದಾಸ', te: 'కనక దాసు' },
                 bio: { en: "Soldier turned saint. Proved devotion is above caste.", hi: "सैनिक से संत बने।", kn: "ಸೈನಿಕನಾಗಿದ್ದು ಸಂತನಾದರು.", te: "సైనికుడిగా ఉండి సంతుగా మారారు." },
-                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీర్తనలు" },
+                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీರ್తనలు" },
                 impact: { en: "Social equality.", hi: "सामाजिक समानता।", kn: "ಸಾಮಾಜಿಕ ಸಮಾನತೆ.", te: "సామాజిక సమానత్వం." },
                 fact: { en: "Idol turned to give him Darshan.", hi: "मूर्ति ने मुड़कर दर्शन दिए।", kn: "ವಿಗ್ರಹವೇ ತಿರುಗಿ ದರ್ಶನ ನೀಡಿತು.", te: "విగ్రహమే తిరిగి దర్శనమిచ్చింది." },
-                dyk: { en: "The window 'Kanakana Kindi' still exists.", hi: "कनकन खिंडी आज भी है।", kn: "ಕನಕನ ಕಿಂಡಿ ಇಂದಿಗೂ ಇದೆ.", te: "కనకన కిండి ఇప్పటికీ ఉంది." }
+                dyk: { en: "The window 'Kanakana Kindi' still exists.", hi: "कनकन खिंडी आज भी है।", kn: "ಕನಕನ ಕಿಂಡಿ ಇಂದಿಗೂ ಇದೆ.", te: "ಕನಕನ ಕಿಂಡಿ ఇప్పటికీ ఉంది." }
             },
             'ramadasu': {
                 name: { en: 'Ramadasu', hi: 'रामदास', kn: 'ರಾಮದಾಸ', te: 'రామదాసు' },
@@ -591,7 +604,7 @@
                 work: { en: "Jnaneshwari", hi: "ज्ञानेश्वरी", kn: "ಜ್ಞಾನೇಶ್ವರಿ", te: "జ్ఞానేశ్వరి" },
                 impact: { en: "Marathi literature.", hi: "मराठी साहित्य।", kn: "ಮರಾಠಿ ಸಾಹಿತ್ಯ.", te: "మరాఠీ సాహిత్యం." },
                 fact: { en: "Took Samadhi at age 21.", hi: "21 साल में समाधि ली।", kn: "21ನೇ ವಯಸ್ಸಿನಲ್ಲಿ ಸಮಾಧಿ.", te: "21 ఏళ్లకే సమాధి తీసుకున్నారు." },
-                dyk: { en: "Made a wall fly.", hi: "दीवार को हवा में उड़ाया।", kn: "ಗೋಡೆ ಹಾರುವಂತೆ ಮಾಡಿದರು.", te: "గోడను గాలిలో ఎగిరేలా చేశారు." }
+                dyk: { en: "Made a wall fly.", hi: "दीवार को हवा में उड़ाया।", kn: "ಗೋಡೆ ಹಾರುವಂತೆ ಮಾಡಿದರು.", te: "ಗೋಡನು ಗాలిలో ఎగిరేలా చేశారు." }
             },
             'namdev': {
                 name: { en: 'Namdev', hi: 'नामदेव', kn: 'ನಾಮದೇವ', te: 'నామదేవ్' },
@@ -618,7 +631,7 @@
                 dyk: { en: "Restarted pilgrim meals.", hi: "तीर्थयात्री भोजन फिर शुरू किया।", kn: "ಯಾತ್ರಿಕರಿಗೆ ಊಟದ ವ್ಯವಸ್ಥೆ ಮಾಡಿದರು.", te: "యాత్రికులకు అన్నదానం పునరుద్ధరించారు." }
             },
             'ramdas': {
-                name: { en: 'Ramdas', hi: 'रामदास', kn: 'ರಾಮದಾಸ್', te: 'ರಾమదాసు' },
+                name: { en: 'Ramdas', hi: 'रामदास', kn: 'ರಾಮದಾಸ್', te: 'రామదాసు' },
                 bio: { en: "Guru of Shivaji. Preached strength and devotion.", hi: "शिवाजी के गुरु। शक्ति और भक्ति का उपदेश दिया।", kn: "ಶಿವಾಜಿಯ ಗುರು. ಶಕ್ತಿ ಮತ್ತು ಭಕ್ತಿ ಬೋಧಿಸಿದರು.", te: "శివాజీ గురువు. శక్తి మరియు భక్తిని బోధించారు." },
                 work: { en: "Dasbodh", hi: "दासबोध", kn: "ದಾಸಬೋಧ", te: "దాసబోధ" },
                 impact: { en: "Built 1100 Hanuman temples.", hi: "1100 हनुमान मंदिर बनवाए।", kn: "1100 ಹನುಮಾನ್ ದೇವಾಲಯ ಕಟ್ಟಿದರು.", te: "1100 హనుమాన్ ఆలయాలు కట్టించారు." },
@@ -707,7 +720,7 @@
             },
             'jayadeva': {
                 name: { en: 'Jayadeva', hi: 'जयदेव', kn: 'ಜಯದೇವ', te: 'జయదేవ' },
-                bio: { en: "Sanskrit poet. Wrote Gita Govinda.", hi: "संस्कृत कवि। गीत गोविंद लिखा।", kn: "ಸಂಸ್ಕೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದ ರಚಿಸಿದರು.", te: "సంస్కೃತ కವಿ. ಗೀತ ಗೋವಿಂದಂ రాశారు." },
+                bio: { en: "Sanskrit poet. Wrote Gita Govinda.", hi: "संस्कृत कवि। गीत गोविंद लिखा।", kn: "ಸಂಸ್ಕೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದ ರಚಿಸಿದರು.", te: "సంస్కೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದಂ రాశారు." },
                 work: { en: "Gita Govinda", hi: "गीत गोविंद", kn: "ಗೀತ ಗೋವಿಂದ", te: "గీత గోవిందం" },
                 impact: { en: "Odissi Dance music.", hi: "ओडिसी संगीत।", kn: "ಒಡಿಸ್ಸಿ ಸಂಗೀತ.", te: "ఒడిస్సీ సంగీతం." },
                 fact: { en: "Krishna completed his verse.", hi: "कृष्ण ने उनका श्लोक पूरा किया।", kn: "ಕೃಷ್ಣನೇ ಇವರ ಶ್ಲೋಕ ಪೂರ್ಣಗೊಳಿಸಿದನು.", te: "కృష్ణుడే వీరి శ్లోకాన్ని పూర్తి చేశాడు." },
@@ -716,7 +729,7 @@
             'vidyapati': {
                 name: { en: 'Vidyapati', hi: 'विद्यापति', kn: 'ವಿದ್ಯಾಪತಿ', te: 'విద్యాపతి' },
                 bio: { en: "Maithili poet. Sang of Radha-Krishna.", hi: "मैथिली कवि। राधा-कृष्ण के गीत गाए।", kn: "ಮೈಥಿಲಿ ಕವಿ. ರಾಧಾ-ಕೃಷ್ಣರ ಬಗ್ಗೆ ಹಾಡಿದರು.", te: "మైథిలి కవి. రాధా-కృష్ణుల గురించి పాడారు." },
-                work: { en: "Padavali", hi: "पदावली", kn: "ಪದಾವಳಿ", te: "పదావళి" },
+                work: { en: "Padavali", hi: "पदावली", kn: "ಪದಾವಳಿ", te: "ಪದಾವಳಿ" },
                 impact: { en: "Bengali literature.", hi: "बंगाली साहित्य।", kn: "ಬಂಗಾಳಿ ಸಾಹಿತ್ಯ.", te: "బెంగాలీ సాహిత్యం." },
                 fact: { en: "Shiva served him as a servant.", hi: "शिव ने सेवक बनकर सेवा की।", kn: "ಶಿವನೇ ಸೇವಕನಾಗಿ ದುಡಿದನು.", te: "శివుడే సేవకుడిగా పనిచేశాడు." },
                 dyk: { en: "Known as Maithil Kokil.", hi: "मैथिल कोकिल कहा जाता है।", kn: "ಮೈಥಿಲ್ ಕೋಗಿಲೆ ಎಂದು ಕರೆಯುತ್ತಾರೆ.", te: "మైథిల్ కోకిల అని పిలుస్తారు." }
