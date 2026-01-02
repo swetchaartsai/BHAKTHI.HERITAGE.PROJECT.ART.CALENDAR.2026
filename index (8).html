@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bhakthi Heritage Art Calendar 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --gold: #d4af37; 
+            --dark: #050505; 
+        }
+        * { box-sizing: border-box; }
+        body, html { 
+            margin: 0; padding: 0; height: 100vh; 
+            background: var(--dark); color: #fff; 
+            font-family: 'Lora', serif;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        /* INITIAL LOADER */
+        #loader {
+            text-align: center;
+            animation: fadeIn 2s ease-in-out;
+        }
+        .lotus { font-size: 4rem; color: var(--gold); margin-bottom: 20px; }
+        h1 { font-family: 'Cinzel'; letter-spacing: 4px; color: var(--gold); margin: 0; font-size: 1.5rem; }
+        p { opacity: 0.6; font-size: 0.9rem; margin-top: 10px; font-family: 'Cinzel'; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* HIDDEN REDIRECT UI (Fallback if JS fails) */
+        .manual-nav { margin-top: 30px; display: none; }
+        .manual-nav a { color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 10px 20px; font-family: 'Cinzel'; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="lotus">❁</div>
+        <h1>BHAKTHI HERITAGE</h1>
+        <p>Entering the Sacred Space...</p>
+        
+        <div class="manual-nav" id="manual-links">
+            <a href="jan.html">ENTER MANUALLY</a>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // Get the 'month' parameter from the URL (e.g., ?month=feb)
+            const urlParams = new URLSearchParams(window.location.search);
+            const month = urlParams.get('month');
+
+            if (month) {
+                // Redirects to the specific file: feb.html, jan.html, etc.
+                const targetPage = month.toLowerCase() + ".html";
+                
+                // Small delay to allow the loader animation to play
+                setTimeout(() => {
+                    window.location.href = targetPage;
+                }, 1500);
+            } else {
+                // If no month is specified, show the manual entry button or redirect to January
+                setTimeout(() => {
+                    document.getElementById('manual-links').style.display = 'block';
+                    // Alternatively, auto-redirect to jan.html as a default:
+                    // window.location.href = "jan.html";
+                }, 2000);
+            }
+        };
+    </script>
+</body>
+</html>
