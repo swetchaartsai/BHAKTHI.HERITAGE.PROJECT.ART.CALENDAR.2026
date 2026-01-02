@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KYB - Know Your Bharath 2026</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Telugu:wght@400;700&family=Noto+Sans+Kannada:wght@400;700&family=Noto+Sans+Devanagari:wght@400;700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        :root {
+            --gold: #d4af37;
+            --paper: #fdfaf0;
+            --dark: #050505;
+            --maroon: #4a0404;
+            --accent: #800000;
+            --saffron: #ff9933;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; font-family: 'Lora', serif; background: var(--paper); overflow-x: hidden; height: 100%; }
+
+        /* Multilingual Fonts */
+        body.lang-hi { font-family: 'Noto Sans Devanagari', 'Lora', serif; }
+        body.lang-kn { font-family: 'Noto Sans Kannada', 'Lora', serif; }
+        body.lang-te { font-family: 'Noto Sans Telugu', 'Lora', serif; }
+
+        /* --- UTILITY CLASSES --- */
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 1s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- 1. LANGUAGE GATEWAY --- */
+        #lang-gateway {
+            position: fixed; inset: 0; background: #000; z-index: 30000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .lang-title { color: var(--gold); font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 40px; text-transform: uppercase; }
+        .lang-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .lang-select-btn {
+            background: transparent; border: 1px solid var(--gold); color: #fff;
+            padding: 15px 30px; font-family: 'Cinzel'; font-size: 1.2rem; cursor: pointer;
+            transition: 0.3s; min-width: 140px;
+        }
+        .lang-select-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+
+        /* --- COMMON STYLES --- */
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        h2 { 
+            font-family: 'Cinzel'; color: var(--maroon); font-size: 2rem; 
+            text-align: center; margin-top: 60px; margin-bottom: 20px; 
+        }
+        h2::after { content: ''; display: block; width: 60px; height: 3px; background: var(--gold); margin: 15px auto 0; }
+        .article-text { font-size: 1.2rem; line-height: 2; text-align: justify; color: #2d241e; }
+        .roots-emphasis { color: #a0522d; font-weight: 700; }
+        
+        .orb-header {
+            width: 80px; height: 80px; margin: 20px auto;
+            background: radial-gradient(circle, #fff700 0%, #ffae00 100%);
+            border-radius: 50%; border: 2px solid white;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Cinzel'; font-weight: bold; color: #4a0404; font-size: 10px; text-align: center;
+            box-shadow: 0 0 30px rgba(255, 174, 0, 0.6);
+        }
+
+        /* --- CHAPTER 1: THE SCROLL --- */
+        #chapter-1 { min-height: 100vh; padding-bottom: 100px; }
+        
+        .bridge { 
+            background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.1), transparent); 
+            color: var(--maroon); padding: 40px 20px; text-align: center;
+            font-family: 'Cinzel'; font-size: 1.4rem; border-top: 1px solid var(--gold); border-bottom: 1px solid var(--gold); 
+            margin: 60px 0; font-style: italic;
+        }
+
+        .gate-container {
+            text-align: center; padding: 60px 20px; margin: 60px 0;
+            background: #fff9eb; border: 4px double var(--gold); border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .gate-btn {
+            background: var(--maroon); color: var(--gold); border: 2px solid var(--gold);
+            padding: 18px 40px; font-family: 'Cinzel'; font-size: 1.3rem; cursor: pointer; font-weight: bold;
+            margin-top: 20px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: inline-flex; align-items: center; gap: 10px;
+        }
+        .gate-btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+
+        /* --- CHAPTER 2: THE MAP (Full Screen Portal) --- */
+        #chapter-2 {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #fdf5e6; z-index: 20000;
+            display: flex; flex-direction: column;
+        }
+
+        /* Mobile Forced Landscape Logic */
+        @media (max-width: 768px) and (orientation: portrait) {
+            #chapter-2 {
+                width: 100vh; height: 100vw; /* Swap Dimensions */
+                top: 50%; left: 50%; /* Center pivot */
+                transform: translate(-50%, -50%) rotate(90deg); /* Rotate around center */
+            }
+        }
+
+        .map-nav {
+            height: 60px; background: var(--maroon); color: var(--gold);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
+            flex-shrink: 0; border-bottom: 2px solid var(--gold);
+        }
+        .map-body { flex: 1; display: flex; overflow: hidden; }
+        #map { flex: 1.8; height: 100%; background: #ddd; z-index: 1; }
+        #sidebar { 
+            flex: 1; min-width: 320px; max-width: 400px; padding: 20px; overflow-y: auto; 
+            background: #fdf5e6 url('https://www.transparenttextures.com/patterns/paper-fibers.png'); 
+            border-left: 2px solid var(--gold);
+        }
+        .close-btn {
+            background: transparent; border: 1px solid var(--gold); color: #fff;
+            padding: 8px 15px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold;
+        }
+        .close-btn:hover { background: var(--gold); color: #000; }
+
+        /* Map Sidebar Content */
+        #search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--gold); font-family: 'Lora'; font-size: 1rem; }
+        .info-header { text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px; }
+        .info-header h1 { font-family: 'Cinzel Decorative'; color: var(--accent); margin: 0; font-size: 1.8rem; }
+        .info-header span { color: var(--gold); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
+        .bio-text { font-size: 1.05rem; line-height: 1.6; text-align: justify; margin-bottom: 15px; color: #333; }
+        .label-head { font-weight: bold; color: var(--accent); margin-top: 15px; display: block; border-left: 3px solid var(--gold); padding-left: 8px; text-transform: uppercase; font-size: 0.9rem; }
+        .highlight-box { background: rgba(184, 134, 11, 0.1); border-left: 4px solid var(--saffron); padding: 12px; margin-top: 15px; font-style: italic; font-size: 0.95rem; line-height: 1.5; color: #5c4a3d; }
+        .dyk-box { background: rgba(128, 0, 0, 0.05); border: 1px solid var(--accent); padding: 12px; margin-top: 15px; font-size: 0.95rem; border-radius: 4px; color: #4a0404; }
+
+        /* Map Markers */
+        .leaflet-tile-pane { filter: sepia(1) hue-rotate(-15deg) contrast(0.9) brightness(0.95); }
+        .marker-box { text-align: center; transition: transform 0.2s; cursor: pointer; }
+        .marker-box:hover { transform: scale(1.15); z-index: 1000; }
+        .saint-dot { width: 12px; height: 12px; background: var(--accent); border: 2px solid var(--gold); border-radius: 50%; margin: 0 auto; box-shadow: 0 0 8px var(--gold); }
+        .perm-label {
+            display: block; background: rgba(44, 30, 17, 0.95); color: #fff; font-size: 10px; font-weight: bold;
+            padding: 2px 6px; border-radius: 4px; border: 0.5px solid var(--gold); 
+            font-family: 'Cinzel', serif; white-space: nowrap; margin-top: 4px;
+        }
+
+        /* --- CHAPTER 3: THE VIBRATIONS --- */
+        #chapter-3 { min-height: 100vh; padding-top: 40px; }
+        
+        .vibration-card { background: white; border-radius: 8px; padding: 25px; margin-bottom: 50px; border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .vibration-card h3 { font-family: 'Cinzel'; color: var(--maroon); margin-top: 0; font-size: 1.3rem; border-bottom: 1px solid var(--gold); display: inline-block; padding-bottom: 5px; }
+        .vid-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; border: 3px double var(--gold); margin-top: 15px; }
+        .vid-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .next-chapter { margin-top: 60px; padding: 60px 20px; text-align: center; background: radial-gradient(circle at center bottom, #382408 0%, #1a0505 50%, #000000 100%); border-radius: 12px; color: #fff; box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 1px solid #331f00; }
+        .next-chapter h3 { font-family: 'Cinzel'; font-size: 2.2rem; margin: 0 0 15px 0; color: #ffdb73; }
+        
+        .footer { background: #1a0404; color: #666; padding: 30px 20px; text-align: center; margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <div id="lang-gateway">
+        <h1 class="lang-title">Namaste</h1>
+        <div class="lang-grid">
+            <button class="lang-select-btn" onclick="startJourney('en')">ENGLISH</button>
+            <button class="lang-select-btn" onclick="startJourney('hi')">हिंदी</button>
+            <button class="lang-select-btn" onclick="startJourney('kn')">ಕನ್ನಡ</button>
+            <button class="lang-select-btn" onclick="startJourney('te')">తెలుగు</button>
+        </div>
+    </div>
+
+    <div id="chapter-1" class="hidden">
+        <div class="orb-header">BHAKTHI<br>2026</div>
+        <div class="container">
+            <div style="text-align:center; margin-bottom:50px;">
+                <h1 style="font-family:'Cinzel'; color:var(--gold); font-size:2rem; margin-bottom:10px;" data-i18n="gateway_title">A New Beginning</h1>
+                <p style="font-style:italic;" data-i18n="gateway_text">Every great discovery can begin with a single step...</p>
+            </div>
+
+            <section class="article-text">
+                <h2 data-i18n="title_soul">The Soul of a Nation</h2>
+                <p data-i18n="text_soul">Culture is not just art; it is the invisible thread holding a civilization together. <b>Culture is the soul of any country.</b> History warns us: when a nation forgets its culture, its downfall is inevitable. But Bharath stands tall. While other ancient civilizations crumbled, the spirit of India lives on. Why? Because of its guardians.</p>
+
+                <h2 data-i18n="title_guardians">The Guardians of Light</h2>
+                <p data-i18n="text_guardians">These guardians were not kings with armies. They were mystics and poets—the Saints of Bharath. When society fractured, they stitched it back together with the strongest thread known to humanity: <b>Love (Bhakthi)</b>.</p>
+
+                <h2 data-i18n="title_roots">Why is this important?</h2>
+                <p data-i18n="text_roots">In a world that changes every day, we often feel lost or distracted. We need something to hold onto.<br><br><span class='roots-emphasis'>Culture is our root system.</span> Without it, we drift; with it, we stand tall. We are sharing this journey not to teach you academic history, but to help you find your own anchor. When you know where you come from, you have the strength to face where you are going.</p>
+
+                <div class="bridge" data-i18n="bridge_text">"This map is not just geography. It is the spiritual nervous system of India. Each light represents a soul who refused to let the darkness win."</div>
+
+                <div class="gate-container">
+                    <div style="font-family:'Cinzel Decorative'; font-size:1.8rem; color:var(--maroon); margin-bottom:10px;" data-i18n="gate_title">The Sacred Map</div>
+                    <p data-i18n="gate_desc">The path ahead is veiled. Consult the Map of Lights to unlock the sacred vibrations.</p>
+                    <button class="gate-btn" onclick="enterMap()">
+                        <span>🗺️</span> <span data-i18n="btn_open_map">OPEN MAP</span>
+                    </button>
+                    <p style="font-size:0.8rem; color:#888; margin-top:10px;" data-i18n="gate_mobile_hint">(Screen will rotate on Mobile)</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="chapter-2" class="hidden">
+        <div class="map-nav">
+            <div style="font-family:'Cinzel'; font-size:1.1rem;" data-i18n="gate_title">The Sacred Map</div>
+            <button class="close-btn" onclick="exitMap()" data-i18n="btn_close">❌ CLOSE & CONTINUE</button>
+        </div>
+        <div class="map-body">
+            <div id="map"></div>
+            <div id="sidebar">
+                <input type="text" id="search-box" placeholder="Search / खोज / ಹುಡುಕಿ / వెతకండి..." onkeyup="searchSaint()">
+                <div id="info-panel">
+                    <div style="text-align:center; padding-top:40px;">
+                        <h1>🪔</h1>
+                        <h2 style="font-size:1.3rem; margin-top:20px;" data-i18n="map_instruction">Click on a Saint</h2>
+                        <p style="color:#888; font-style:italic;" data-i18n="map_disclaimer">Discover the lives that lit up Bharath.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="chapter-3" class="hidden">
+        <div class="orb-header">BHAKTHI<br>2026</div>
+        <div class="container">
+            <h2 data-i18n="title_vibrations">Sacred Vibrations</h2>
+            
+            <div class="vibration-card">
+                <h3 data-i18n="vid1_title">The Value of the One</h3>
+                <p data-i18n="vid1_desc">Sadguru Sri Madhusudan Sai emphasises...</p>
+                <div class="vid-wrapper"><iframe src="https://www.youtube.com/embed/jfKXI_5wLGs?rel=0" frameborder="0" allowfullscreen></iframe></div>
+            </div>
+
+            <div class="vibration-card">
+                <h3 data-i18n="vid2_title">The Intensity of Emotion</h3>
+                <p data-i18n="vid2_desc">Bhakti Yoga means using the intensity of one's emotion...</p>
+                <div class="vid-wrapper"><iframe src="https://www.youtube.com/embed/BFurJfUSq8o?rel=0" frameborder="0" allowfullscreen></iframe></div>
+            </div>
+
+            <div class="vibration-card" style="background:#fff9eb; border:2px dashed #d4af37;">
+                <h3 data-i18n="vid3_title">Yatra: The Journey of Namdev</h3>
+                <p data-i18n="vid3_desc">Nāmdev is a saint from Maharashtra...</p>
+                <div class="vid-wrapper"><iframe src="https://www.youtube.com/embed/uW6pd1PSe3g?rel=0" frameborder="0" allowfullscreen></iframe></div>
+            </div>
+
+            <div class="next-chapter">
+                <span style="font-size:2rem; color:var(--gold);">✦</span>
+                <h3 data-i18n="teaser_title">A New Saint Awaits...</h3>
+                <p data-i18n="teaser_text_intro">The journey has just begun...</p>
+                <p data-i18n="teaser_text_climax" style="font-style: italic; color: #ffdb73;">Next month, a new light rises from the dust of history.</p>
+                <p><span style="border-bottom:2px solid var(--gold); font-weight:bold;" data-i18n="teaser_cta">Stay tuned for February.</span></p>
+            </div>
+
+            <div style="text-align:center; margin-top:60px; padding:20px; border-top:1px solid #ddd; background:#faf8f0; border-radius:8px;">
+                <p data-i18n="credits_art">Art by <b>Swetcha Art</b> | Content by <b>Sai Prema</b></p>
+                <p style="color:#d4af37; font-weight:bold; margin-top:15px;" data-i18n="credits_warriors">Inspiration: <b>Bhakthi Warriors</b></p>
+                <p style="font-size:0.9rem; color:#666;" data-i18n="credits_soon">You are going to meet them soon.</p>
+            </div>
+        </div>
+        <footer class="footer"><b data-i18n="footer_text">Bhakthi Heritage Art Calendar 2026</b></footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        let currentLang = 'en';
+        let map; 
+        let markers = [];
+
+        // --- 1. TRANSLATION DATA ---
+        const i18n = {
+            'en': {
+                gateway_title: "A New Beginning for 2026",
+                gateway_text: "Every great discovery can begin with a single step. As we step into 2026, let us choose to start with light.",
+                title_soul: "The Soul of a Nation",
+                text_soul: "Culture is not just art; it is the invisible thread holding a civilization together. <b>Culture is the soul of any country.</b> History warns us: when a nation forgets its culture, its downfall is inevitable. But Bharath stands tall. While other ancient civilizations crumbled, the spirit of India lives on. Why? Because of its guardians.",
+                title_guardians: "The Guardians of Light",
+                text_guardians: "These guardians were not kings with armies. They were mystics and poets—the Saints of Bharath. When society fractured, they stitched it back together with the strongest thread known to humanity: <b>Love (Bhakthi)</b>.",
+                title_roots: "Why is this important?",
+                text_roots: "In a world that changes every day, we often feel lost or distracted. We need something to hold onto.<br><br><span class='roots-emphasis'>Culture is our root system.</span> Without it, we drift; with it, we stand tall. We are sharing this journey not to teach you academic history, but to help you find your own anchor.",
+                bridge_text: "\"This map is not just geography. It is the spiritual nervous system of India. Each light represents a soul who refused to let the darkness win.\"",
+                gate_title: "The Sacred Map",
+                gate_desc: "The path ahead is veiled. Consult the Map of Lights to unlock the sacred vibrations.",
+                btn_open_map: "OPEN MAP",
+                btn_close: "❌ CLOSE & CONTINUE",
+                gate_mobile_hint: "(Screen will rotate on Mobile)",
+                map_instruction: "Click on a Saint's name",
+                map_disclaimer: "There are 100s of such wonderful saints. Only some are mentioned here.",
+                label_contribution: "Contribution", label_impact: "Impact", label_fact: "Sacred Legend",
+                title_vibrations: "Sacred Vibrations",
+                vid1_title: "The Value of the One", vid1_desc: "Sadguru Sri Madhusudan Sai emphasises to the students that when bhakti is there, everything gains value.",
+                vid2_title: "The Intensity of Emotion", vid2_desc: "Bhakti Yoga means using the intensity of one's emotion to transcend one's limitations.",
+                vid3_title: "Yatra: The Journey of Namdev", vid3_desc: "A journey through Namdev's life with storytelling and music.",
+                teaser_title: "A New Saint Awaits...", teaser_text_intro: "The journey has just begun.",
+                teaser_text_climax: "Next month, a new light rises from the dust of history.",
+                teaser_cta: "Stay tuned for February.",
+                credits_art: "Art by <b>Swetcha Art</b> | Content by <b>Sai Prema Photography</b>",
+                credits_warriors: "Inspiration - <b>Bhakthi Warriors</b>",
+                credits_soon: "You are going to meet them soon.",
+                footer_text: "Bhakthi Heritage Art Calendar 2026"
+            },
+            'hi': {
+                gateway_title: "2026 की नई शुरुआत",
+                gateway_text: "हर महान खोज एक छोटे कदम से शुरू होती है। 2026 में, आइए प्रकाश के साथ शुरुआत करें।",
+                title_soul: "राष्ट्र की आत्मा",
+                text_soul: "संस्कृति केवल कला नहीं है; यह वह अदृश्य धागा है जो सभ्यता को जोड़ता है। <b>संस्कृति किसी भी देश की आत्मा है।</b> जब कोई राष्ट्र अपनी संस्कृति को भूल जाता है, तो उसका पतन निश्चित है।",
+                title_guardians: "प्रकाश के रक्षक",
+                text_guardians: "ये रक्षक राजा नहीं थे, वे संत थे। जब समाज टूटने लगा, तो उन्होंने इसे मानवता के सबसे मजबूत धागे से वापस जोड़ दिया: <b>प्रेम (भक्ति)</b>।",
+                title_roots: "यह महत्वपूर्ण क्यों है?",
+                text_roots: "ऐसी दुनिया में जो हर दिन बदलती है, हम अक्सर खोया हुआ या विचलित महसूस करते हैं। <br><br><span class='roots-emphasis'>संस्कृति हमारी जड़ है।</span> इसके बिना हम बह जाते हैं; इसके साथ हम गर्व से खड़े रहते हैं।",
+                bridge_text: "\"यह मानचित्र केवल भूगोल नहीं है। यह भारत का आध्यात्मिक तंत्रिका तंत्र है।\"",
+                gate_title: "पवित्र मानचित्र",
+                gate_desc: "आगे का रास्ता छिपा है। पवित्र स्पंदनों को खोलने के लिए मानचित्र देखें।",
+                btn_open_map: "मानचित्र खोलें",
+                btn_close: "❌ बंद करें और आगे बढ़ें",
+                gate_mobile_hint: "(मोबाइल पर स्क्रीन घूमेगी)",
+                map_instruction: "संत के नाम पर क्लिक करें",
+                map_disclaimer: "ऐसे सैकड़ों संत हैं, हम यहां केवल कुछ का उल्लेख कर रहे हैं।",
+                label_contribution: "योगदान", label_impact: "प्रभाव", label_fact: "कथा / तथ्य",
+                title_vibrations: "पवित्र स्पंदन",
+                vid1_title: "एक (1) का मूल्य", vid1_desc: "सद्गुरु मधुसूदन साई: 'भक्ति जीवन का वह 1 है जिसके बिना सब शून्य है।'",
+                vid2_title: "भावना की तीव्रता", vid2_desc: "भक्ति योग का अर्थ है अपनी भावनाओं की तीव्रता का उपयोग करके सीमाओं को पार करना।",
+                vid3_title: "यात्रा: नामदेव की कहानी", vid3_desc: "संत नामदेव के जीवन से प्रेरित एक संगीतमय यात्रा।",
+                teaser_title: "एक नया संत...", teaser_text_intro: "यात्रा अभी शुरू हुई है।",
+                teaser_text_climax: "अगले महीने, इतिहास की धूल से एक नया प्रकाश उठेगा।",
+                teaser_cta: "फरवरी के लिए बने रहें।",
+                credits_art: "कला: <b>स्वेच्छा आर्ट</b> | सामग्री: <b>साई प्रेमा</b>",
+                credits_warriors: "प्रेरणा - <b>भक्ति वॉरियर्स</b>",
+                credits_soon: "जल्द ही मिलेंगे।",
+                footer_text: "भक्ति हेरिटेज आर्ट कैलेंडर 2026"
+            },
+            'kn': {
+                gateway_title: "2026 ಕ್ಕೆ ಹೊಸ ಆರಂಭ",
+                gateway_text: "ಪ್ರತಿಯೊಂದು ದೊಡ್ಡ ಆವಿಷ್ಕಾರವು ಒಂದು ಸಣ್ಣ ಹೆಜ್ಜೆಯಿಂದ ಪ್ರಾರಂಭವಾಗುತ್ತದೆ.",
+                title_soul: "ರಾಷ್ಟ್ರದ ಆತ್ಮ",
+                text_soul: "ಸಂಸ್ಕೃತಿಯು ಕೇವಲ ಕಲೆಯಲ್ಲ; ಇದು ನಾಗರಿಕತೆಯನ್ನು ಹಿಡಿದಿಟ್ಟುಕೊಳ್ಳುವ ಅದೃಶ್ಯ ದಾರ. <b>ಸಂಸ್ಕೃತಿಯು ಯಾವುದೇ ದೇಶದ ಆತ್ಮ.</b>",
+                title_guardians: "ಬೆಳಕಿನ ರಕ್ಷಕರು",
+                text_guardians: "ಈ ರಕ್ಷಕರು ರಾಜರಲ್ಲ, ಅವರು ಸಂತರು. ಸಮಾಜ ಒಡೆದಾಗ, ಅವರು ಅದನ್ನು ಪ್ರೀತಿ ಮತ್ತು ಭಕ್ತಿಯಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿದರು.",
+                title_roots: "ಇದು ಏಕೆ ಮುಖ್ಯ?",
+                text_roots: "ಪ್ರತಿದಿನ ಬದಲಾಗುತ್ತಿರುವ ಜಗತ್ತಿನಲ್ಲಿ, ನಾವು ಆಗಾಗ್ಗೆ ಕಳೆದುಹೋದಂತೆ ಭಾವಿಸುತ್ತೇವೆ. <br><br><span class='roots-emphasis'>ಸಂಸ್ಕೃತಿಯೇ ನಮ್ಮ ಬೇರು.</span> ಅದಿಲ್ಲದೆ ನಾವು ಅಲೆದಾಡುತ್ತೇವೆ; ಅದಿದ್ದರೆ ನಾವು ಎತ್ತರವಾಗಿ ನಿಲ್ಲುತ್ತೇವೆ.",
+                bridge_text: "\"ಈ ನಕ್ಷೆಯು ಕೇವಲ ಭೂಗೋಳವಲ್ಲ. ಇದು ಭಾರತದ ಆಧ್ಯಾತ್ಮಿಕ ನರಮಂಡಲ.\"",
+                gate_title: "ಪವಿತ್ರ ನಕ್ಷೆ",
+                gate_desc: "ಮುಂದಿನ ಹಾದಿ ಮುಚ್ಚಿದೆ. ಮುಂದುವರಿಯಲು ನಕ್ಷೆಯನ್ನು ನೋಡಿ.",
+                btn_open_map: "ನಕ್ಷೆಯನ್ನು ತೆರೆಯಿರಿ",
+                btn_close: "❌ ಮುಚ್ಚಿ ಮತ್ತು ಮುಂದುವರಿಯಿರಿ",
+                gate_mobile_hint: "(ಮೊಬೈಲ್‌ನಲ್ಲಿ ಸ್ಕ್ರೀನ್ ತಿರುಗುತ್ತದೆ)",
+                map_instruction: "ಸಂತರ ಹೆಸರಿನ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ",
+                map_disclaimer: "ಇಂತಹ ನೂರಾರು ಸಂತರಿದ್ದಾರೆ. ಕೆಲವರನ್ನು ಮಾತ್ರ ಇಲ್ಲಿ ಹೆಸರಿಸಲಾಗಿದೆ.",
+                label_contribution: "ಕೊಡುಗೆ", label_impact: "ಪ್ರಭಾವ", label_fact: "ವಿಶೇಷ / ಕಥೆ",
+                title_vibrations: "ಪವಿತ್ರ ಕಂಪನಗಳು",
+                vid1_title: "ಒಂದರ (1) ಮೌಲ್ಯ", vid1_desc: "ಭಕ್ತಿಯೇ ಆ '1' ಎಂದು ಸದ್ಗುರು ವಿವರಿಸುತ್ತಾರೆ.",
+                vid2_title: "ಭಾವನೆಯ ತೀವ್ರತೆ", vid2_desc: "ಭಕ್ತಿ ಯೋಗವು ಭಾವನೆಗಳ ತೀವ್ರತೆಯ ಮೂಲಕ ಮಿತಿಗಳನ್ನು ಮೀರುವುದಾಗಿದೆ.",
+                vid3_title: "ಯಾತ್ರೆ: ನಾಮದೇವರ ಕಥೆ", vid3_desc: "ಸಂತ ನಾಮದೇವರ ಜೀವನ ಆಧಾರಿತ ಸಂಗೀತ ಕಾರ್ಯಕ್ರಮ.",
+                teaser_title: "ಹೊಸ ಸಂತ ಕಾಯುತ್ತಿದ್ದಾರೆ...", teaser_text_intro: "ಪ್ರಯಾಣ ಈಗಷ್ಟೇ ಶುರುವಾಗಿದೆ.",
+                teaser_text_climax: "ಮುಂದಿನ ತಿಂಗಳು, ಹೊಸ ಬೆಳಕು ಉದಯಿಸಲಿದೆ.",
+                teaser_cta: "ಫೆಬ್ರವರಿಗಾಗಿ ನಿರೀಕ್ಷಿಸಿ.",
+                credits_art: "ಕಲೆ: <b>ಸ್ವೇಚ್ಛಾ ಆರ್ಟ್</b> | ವಿಷಯ: <b>ಸಾಯಿ ಪ್ರೇಮಾ</b>",
+                credits_warriors: "ಸ್ಫೂರ್ತಿ - <b>ಭक्ति ವಾರಿಯರ್ಸ್</b>",
+                credits_soon: "ಶೀಘ್ರದಲ್ಲೇ ಭೇಟಿಯಾಗೋಣ.",
+                footer_text: "ಭಕ್ತಿ ಹೆರಿಟೇಜ್ ಆರ್ಟ್ ಕ್ಯಾಲೆಂಡರ್ 2026"
+            },
+            'te': {
+                gateway_title: "2026 కి కొత్త ఆరంభం",
+                gateway_text: "ప్రతి గొప్ప ఆవిష్కరణ ఒక చిన్న అడుగుతో మొదలవుతుంది.",
+                title_soul: "జాతి ఆత్మ",
+                text_soul: "సంస్కృతి అంటే కేవలం కళ కాదు; అది నాగరికతను నిలబెట్టే అదృశ్య సూత్రం. <b>సంస్కృతి ఏ దేశానికైనా ఆత్మ వంటిది.</b>",
+                title_guardians: "జ్ఞాన రక్షకులు",
+                text_guardians: "ఈ రక్షకులు రాజులు కాదు, వారు ఋషులు. సమాజం విచ్ఛిన్నమైనప్పుడు, వారు దానిని <b>భక్తి</b> అనే దారంతో తిరిగి కలిపారు.",
+                title_roots: "ఇది ఎందుకు ముఖ్యం?",
+                text_roots: "ప్రతిరోజూ మారుతున్న ఈ ప్రపంచంలో, మనం తరచుగా దారి తప్పినట్లు భావిస్తాము. <br><br><span class='roots-emphasis'>సంస్కృతి మన మూల వ్యవస్థ.</span> అది లేకపోతే మనం కొట్టుకుపోతాం; అది ఉంటే మనం నిలబడతాం.",
+                bridge_text: "\"ఈ మ్యాప్ కేవలం భౌగోళికం కాదు. ఇది భారతదేశపు ఆధ్యాత్మిక నాడీ వ్యవస్థ.\"",
+                gate_title: "పవిత్ర మ్యాప్",
+                gate_desc: "ముందుకు వెళ్ళే దారి దాగి ఉంది. దానిని తెరవడానికి మ్యాప్ చూడండి.",
+                btn_open_map: "మ్యాప్ తెరవండి",
+                btn_close: "❌ మూసివేసి కొనసాగించండి",
+                gate_mobile_hint: "(మొబైల్‌లో స్క్రీన్ తిరుగుతుంది)",
+                map_instruction: "సంత్ పేరుపై క్లిక్ చేయండి",
+                map_disclaimer: "వందల సంఖ్యలో సంత్ లు ఉన్నారు. కొందరిని మాత్రమే ఇక్కడ పేర్కొన్నాము.",
+                label_contribution: "సమర్పణ", label_impact: "ప్రభావం", label_fact: "వాస్తవం / కథ",
+                title_vibrations: "పవిత్ర ప్రకంపనలు",
+                vid1_title: "ఒకటి (1) యొక్క విలువ", vid1_desc: "జీవితంలో భక్తి ఆ '1' వంటిది అని సద్గురు చెప్పారు.",
+                vid2_title: "భావోద్వేగ తీవ్రత", vid2_desc: "భక్తి యోగం అంటే భావోద్వేగ తీవ్రతతో పరిమితులను దాటడం.",
+                vid3_title: "యాత్ర: నామదేవుని కథ", vid3_desc: "సంత్ నామదేవ్ జీవితం ఆధారంగా ఒక సంగీత యాత్ర.",
+                teaser_title: "ఒక కొత్త సంతు...", teaser_text_intro: "ప్రయాణం ఇప్పుడే మొదలైంది.",
+                teaser_text_climax: "వచ్చే నెలలో, చరిత్ర నుండి ఒక కొత్త వెలుగు ఉద్భవించనుంది.",
+                teaser_cta: "ఫిబ్రవరి కోసం వేచి ఉండండి.",
+                credits_art: "కళ: <b>స్వేచ్ఛా ఆర్ట్</b> | కంటెంట్: <b>సాయి ప్రేమ</b>",
+                credits_warriors: "స్ఫూర్తి - <b>భక్తి వారియర్స్</b>",
+                credits_soon: "త్వరలో కలుద్దాం.",
+                footer_text: "భక్తి హెరిటేజ్ ఆర్ಟ್ క్యాలెండర్ 2026"
+            }
+        };
+
+        // --- 2. SAINT DATA (Coordinates) ---
+        const saintsData = [
+            { id: 'shankara', coords: [10.15, 76.43], era: "8th C" },
+            { id: 'andal', coords: [9.51, 77.53], era: "8th C" },
+            { id: 'ramanuja', coords: [10.86, 78.69], era: "11th C" },
+            { id: 'madhva', coords: [13.34, 74.74], era: "13th C" },
+            { id: 'basavanna', coords: [16.48, 75.94], era: "12th C" },
+            { id: 'akka', coords: [14.12, 75.36], era: "12th C" },
+            { id: 'nammalvar', coords: [8.61, 77.94], era: "9th C" },
+            { id: 'appar', coords: [11.53, 79.50], era: "7th C" },
+            { id: 'purandara', coords: [15.33, 76.46], era: "16th C" },
+            { id: 'kanaka', coords: [14.65, 75.38], era: "16th C" },
+            { id: 'ramadasu', coords: [17.67, 80.89], era: "17th C" },
+            { id: 'annamayya', coords: [13.62, 79.41], era: "15th C" },
+            { id: 'potana', coords: [18.03, 79.28], era: "15th C" },
+            { id: 'tyagaraja', coords: [10.87, 79.10], era: "18th C" },
+            { id: 'jnaneshwar', coords: [18.63, 73.88], era: "13th C" },
+            { id: 'namdev', coords: [17.67, 75.33], era: "14th C" },
+            { id: 'tukaram', coords: [18.71, 73.75], era: "17th C" },
+            { id: 'eknath', coords: [19.48, 75.38], era: "16th C" },
+            { id: 'ramdas', coords: [17.65, 73.92], era: "17th C" },
+            { id: 'narsinh', coords: [21.52, 70.45], era: "15th C" },
+            { id: 'kabir', coords: [25.31, 82.97], era: "15th C" },
+            { id: 'mirabai', coords: [26.64, 74.02], era: "16th C" },
+            { id: 'tulsidas', coords: [25.46, 82.51], era: "16th C" },
+            { id: 'gurunanak', coords: [31.52, 74.35], era: "15th C" },
+            { id: 'ravidas', coords: [25.26, 83.00], era: "15th C" },
+            { id: 'surdas', coords: [27.21, 77.83], era: "16th C" },
+            { id: 'gobind', coords: [25.61, 85.17], era: "17th C" },
+            { id: 'chaitanya', coords: [23.42, 88.36], era: "16th C" },
+            { id: 'sankardev', coords: [26.34, 92.68], era: "15th C" },
+            { id: 'jayadeva', coords: [20.27, 85.83], era: "12th C" },
+            { id: 'vidyapati', coords: [26.12, 85.89], era: "14th C" },
+            { id: 'lalded', coords: [34.08, 74.79], era: "14th C" }
+        ];
+
+        // --- 3. RICH CONTENT (With Manual Translations) ---
+        const saintDetails = {
+            'shankara': {
+                name: { en: 'Adi Shankara', hi: 'आदि शंकर', kn: 'ಆದಿ ಶಂಕರ', te: 'ఆది శంకర' },
+                bio: { 
+                    en: "The master of Non-dualism, Shankara revived Sanatana Dharma through rigorous intellectual debate. He traveled the length of Bharat on foot, establishing four cardinal Mathas.",
+                    hi: "अद्वैतवाद के महान आचार्य, शंकर ने कठोर बौद्धिक बहस के माध्यम से सनातन धर्म को पुनर्जीवित किया। उन्होंने पूरे भारत की पैदल यात्रा की।",
+                    kn: "ಅದ್ವೈತ ಸಿದ್ಧಾಂತದ ಪ್ರವರ್ತಕರಾದ ಆದಿ ಶಂಕರರು, ಸನಾತನ ಧರ್ಮವನ್ನು ಪುನರುಜ್ಜೀವನಗೊಳಿಸಿದರು. ಇಡೀ ಭಾರತವನ್ನು ಕಾಲ್ನಡಿಗೆಯಲ್ಲಿ ಸುತ್ತಿದರು.",
+                    te: "అద్వైత సిద్ధాంతకర్త అయిన ఆది శంకరులు, సనాతన ధర్మాన్ని పునరుద్ధరించారు. దేశమంతా పాదయాత్ర చేశారు."
+                },
+                work: { en: "Advaita Vedanta", hi: "अद्वैत वेदांत", kn: "ಅದ್ವೈತ ವೇದಾಂತ", te: "అద్వైత వేదాంతం" },
+                impact: { en: "Unified diverse sects into the Shanmata system.", hi: "हिंदू धर्म का एकीकरण।", kn: "ಹಿಂದೂ ಧರ್ಮದ ಏಕೀಕರಣ.", te: "హిందూ మత ఏకీకరణ." },
+                fact: { en: "Established the 4 Mathas (Corners) of Bharat.", hi: "पैदल भारत यात्रा की।", kn: "ಕಾಲ್ನಡಿಗೆಯಲ್ಲಿ ಭಾರತ ಪರ್ಯಟನೆ.", te: "కాలినడకన భారత యాత్ర." },
+                dyk: { en: "He wrote his commentaries on the Brahma Sutras at the age of 16.", hi: "उन्होंने 16 वर्ष की आयु में भाष्य लिखे।", kn: "16ನೇ ವಯಸ್ಸಿನಲ್ಲಿ ಭಾಷ್ಯ ಬರೆದರು.", te: "16 ఏళ్ల వయసులోనే భాష్యం రాశారు." }
+            },
+            'andal': {
+                name: { en: 'Andal', hi: 'आंडाल', kn: 'ಆಂಡಾಳ್', te: 'ఆండాళ్' },
+                bio: { 
+                    en: "The only female Alvar. Andal saw Lord Vishnu as her beloved and refused to marry anyone else, expressing her intense bridal devotion through immortal Tamil poetry.",
+                    hi: "एकमात्र महिला आलवार। आंडाल ने भगवान विष्णु को अपने प्रियतम के रूप में देखा और अमर तमिल कविता के माध्यम से अपनी भक्ति व्यक्त की।",
+                    kn: "ಏಕೈಕ ಮಹಿಳಾ ಆಳ್ವಾರ್. ಆಂಡಾಳ್ ವಿಷ್ಣುವನ್ನು ತನ್ನ ಪತಿಯಾಗಿ ಸ್ವೀಕರಿಸಿದರು ಮತ್ತು ತಮಿಳು ಕಾವ್ಯದ ಮೂಲಕ ಮಧುರ ಭಕ್ತಿಯನ್ನು ವ್ಯಕ್ತಪಡಿಸಿದರು.",
+                    te: "ఏకైక మహిళా ఆల్వార్. ఆండాళ్ శ్రీమహావిష్ణువును తన ప్రియుడిగా భావించి, తన తమిళ కవిత్వం ద్వారా మధుర భక్తిని చాటారు."
+                },
+                work: { en: "Thiruppavai", hi: "तिरुप्पवै", kn: "ತಿರುಪ್ಪಾವೈ", te: "తిరుప్పావై" },
+                impact: { en: "Her verses are the backbone of Margazhi prayers.", hi: "विवाह रहस्यवाद।", kn: "ಮಧುರ ಭಕ್ತಿ.", te: "మధుర భక్తి." },
+                fact: { en: "She merged into the deity of Lord Ranganatha.", hi: "एकमात्र महिला आलवार।", kn: "ಏಕೈಕ ಮಹಿಳಾ ಆಳ್ವಾರ್.", te: "ఏకైక మహిళా ఆల్వార్." },
+                dyk: { en: "She secretly wore the deity's garlands before they were offered.", hi: "वह भगवान की मालाएँ पहले खुद पहन लेती थीं।", kn: "ದೇವರಿಗೆ ಅರ್ಪಿಸುವ ಹೂಮಾಲೆಯನ್ನು ತಾನು ಧರಿಸುತ್ತಿದ್ದರು.", te: "స్వామికి సమర్పించాల్సిన పూలమాలలను ముందుగా తాను ధరించేవారు." }
+            },
+            'ramanuja': {
+                name: { en: 'Ramanujacharya', hi: 'रामानुज', kn: 'ರಾಮಾನುಜ', te: 'రామానుజ' },
+                bio: { en: "The chief proponent of Qualified Non-dualism. A social revolutionary who taught that Bhakti was open to all, regardless of caste.", hi: "विशिष्टाद्वैत के प्रवर्तक। एक सामाजिक क्रांतिकारी जिन्होंने सिखाया कि भक्ति सभी के लिए है।", kn: "ವಿಶಿಷ್ಟಾದ್ವೈತ ಸಿದ್ಧಾಂತದ ಪ್ರತಿಪಾದಕರು. ಭಕ್ತಿ ಮಾರ್ಗವು ಎಲ್ಲರಿಗೂ ಮುಕ್ತವಾಗಿದೆ ಎಂದು ಬೋಧಿಸಿದರು.", te: "విశిష్టాద్వైత సిద్ధాంతకర్త. భక్తి మార్గం అందరికీ అందుబాటులో ఉంటుందని బోధించారు." },
+                work: { en: "Visishtadvaita", hi: "विशिष्टाद्वैत", kn: "ವಿಶಿಷ್ಟಾದ್ವೈತ", te: "విశిష్టాద్వైతం" },
+                impact: { en: "Organized temple rituals for major hubs.", hi: "भक्ति दर्शन।", kn: "ಭಕ್ತಿ ದರ್ಶನ.", te: "భక్తి తత్వం." },
+                fact: { en: "Called marginalized people 'Thirukulattar'.", hi: "120 वर्ष तक जीवित रहे।", kn: "120 ವರ್ಷ ಬದುಕಿದ್ದರು.", te: "120 సంవత్సరాలు జీవించారు." },
+                dyk: { en: "Shouted the secret mantra from a temple tower to all.", hi: "गोपुरम से सभी को मंत्र सुनाया।", kn: "ಗೋಪುರದ ಮೇಲಿನಿಂದ ಮಂತ್ರ ಬೋಧಿಸಿದರು.", te: "గోపురం ఎక్కి మంత్రాన్ని వినిపించారు." }
+            },
+            'madhva': {
+                name: { en: 'Madhvacharya', hi: 'मध्वाचार्य', kn: 'ಮಧ್ವಾಚಾರ್ಯ', te: 'మధ్వాచార్య' },
+                bio: { en: "Founder of Dualism. Established the Ashta Mathas of Udupi and popularized Krishna worship.", hi: "द्वैतवाद के संस्थापक। उडुपी के अष्ट मठों की स्थापना की।", kn: "ದ್ವೈತ ಸಿದ್ಧಾಂತದ ಸ್ಥಾಪಕರು. ಉಡುಪಿಯಲ್ಲಿ ಅಷ್ಟ ಮಠಗಳನ್ನು ಸ್ಥಾಪಿಸಿದರು.", te: "ద్వైత సిద్ధాంత స్థాపకులు. ఉడిపిలో అష్ట మఠాలను స్థాపించారు." },
+                work: { en: "Dvaita", hi: "द्वैत", kn: "ದ್ವೈತ", te: "ద్వైత" },
+                impact: { en: "Krishna Bhakti in Karnataka.", hi: "कृष्ण भक्ति", kn: "ಕೃಷ್ಣ ಭಕ್ತಿ", te: "కృష్ణ భక్తి" },
+                fact: { en: "Founder of Udupi Matha.", hi: "उडुपी मठ संस्थापक", kn: "ಉಡುಪಿ ಮಠ ಸ್ಥಾಪಕರು", te: "ఉడిపి మఠ స్థాపకులు" },
+                dyk: { en: "Possessed immense physical strength.", hi: "अत्यंत बलशाली थे।", kn: "ಅಪಾರ ದೈಹಿಕ ಶಕ್ತಿ ಹೊಂದಿದ್ದರು.", te: "గొప్ప శారీరక బలం కలవారు." }
+            },
+            'basavanna': {
+                name: { en: 'Basavanna', hi: 'बसवन्ना', kn: 'ಬಸವಣ್ಣ', te: 'బసవన్న' },
+                bio: { en: "Social reformer who founded the Lingayat movement. Preached 'Work is Worship' and established Anubhava Mantapa.", hi: "लिंगायत आंदोलन के संस्थापक। 'कर्म ही पूजा है' का उपदेश दिया।", kn: "ಲಿಂಗಾಯತ ಧರ್ಮದ ಸ್ಥಾಪಕರು. 'ಕಾಯಕವೇ ಕೈಲಾಸ' ಎಂದು ಬೋಧಿಸಿದರು.", te: "లింగాయత ఉద్యమ స్థాపకులు. 'పనే దైవం' అని బోధించారు." },
+                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "వచన" },
+                impact: { en: "Abolished caste hierarchy.", hi: "समाज सुधारक।", kn: "ಸಮಾಜ ಸುಧಾರಕ.", te: "సామాజిక సంస్కర్త." },
+                fact: { en: "Established Anubhava Mantapa.", hi: "अनुभव मंटप।", kn: "ಅನುಭವ ಮಂಟಪ.", te: "అనుభవ మంటపం." },
+                dyk: { en: "Said the human body is a moving temple.", hi: "शरीर ही मंदिर है।", kn: "ದೇಹವೇ ದೇಗುಲ.", te: "శరీరమే దేవాలయం." }
+            },
+            'akka': {
+                name: { en: 'Akka Mahadevi', hi: 'अक्का महादेवी', kn: 'ಅಕ್ಕ ಮಹಾದೇವಿ', te: 'అక్క మహాదేవి' },
+                bio: { en: "A female mystic who renounced the world for Shiva. She wandered as an ascetic.", hi: "एक महिला संत जिन्होंने शिव के लिए संसार त्याग दिया।", kn: "ಶಿವನಿಗಾಗಿ ಸಂಸಾರ ತ್ಯಜಿಸಿದ ಶರಣೆ.", te: "శివుని కోసం ప్రపంచాన్ని త్యజించిన యోగిని." },
+                work: { en: "Vachanas", hi: "वचन", kn: "ವಚನ", te: "వచన" },
+                impact: { en: "Female empowerment in spirituality.", hi: "महिला सशक्तिकरण।", kn: "ಮಹಿಳಾ ಸಬಲೀಕರಣ.", te: "మహిళా సాధికారత." },
+                fact: { en: "Wore only her hair.", hi: "केशों से शरीर ढका।", kn: "ಕೂದಲೇ ವಸ್ತ್ರವಾಗಿತ್ತು.", te: "జుట్టుతో శరీరాన్ని కప్పుకున్నారు." },
+                dyk: { en: "Considered Shiva as her husband 'Chenna Mallikarjuna'.", hi: "शिव को अपना पति माना।", kn: "ಚನ್ನಮಲ್ಲಿಕಾರ್ಜುನನೇ ಪತಿ ಎಂದು ನಂಬಿದ್ದರು.", te: "చెన్నమల్లికార్జునుడిని భర్తగా భావించారు." }
+            },
+            'tyagaraja': {
+                name: { en: 'Tyagaraja', hi: 'त्यागराज', kn: 'ತ್ಯಾಗರಾಜ', te: 'త్యాగరాజు' },
+                bio: { en: "Greatest Rama devotee in music. Renounced wealth to sing thousands of divine melodies.", hi: "संगीत में राम के सबसे बड़े भक्त। धन का त्याग किया।", kn: "ಕರ್ನಾಟಕ ಸಂಗೀತದ ಶ್ರೇಷ್ಠ ರಾಮ ಭಕ್ತರು.", te: "సంగీత సంప్రదాయంలో గొప్ప రామ భక్తుడు." },
+                work: { en: "Pancharatna Kritis", hi: "पंचरत्न", kn: "ಪಂಚರತ್ನ", te: "పంచరత్న" },
+                impact: { en: "Music Trinity.", hi: "संगीत त्रिमूर्ति", kn: "ಸಂಗೀತ ತ್ರಿಮೂರ್ತಿ", te: "సంగీత త్రిమూర్తులు" },
+                fact: { en: "Saw Rama in person.", hi: "राम दर्शन।", kn: "ರಾಮ ದರ್ಶನ.", te: "రామ దర్శనం." },
+                dyk: { en: "Saw Rama while singing 'Bhavanutha'.", hi: "गाते समय राम को देखा।", kn: "ಹಾಡುವಾಗ ರಾಮನಿಗಾಗಿ ಕಂಡರು.", te: "పాడుతుండగా రాముడు కనిపించాడు." }
+            },
+            'purandara': {
+                name: { en: 'Purandara Dasa', hi: 'पुरंदर दास', kn: 'ಪುರಂದರ ದಾಸ', te: 'ಪುರಂದರ దాస' },
+                bio: { en: "Father of Carnatic Music. Once a greedy merchant, became a saint.", hi: "कर्नाटक संगीत के पितामह। पहले एक व्यापारी थे।", kn: "ಕರ್ನಾಟಕ ಸಂಗೀತ ಪಿತಾಮಹ. ಮೊದಲು ವ್ಯಾಪಾರಿಯಾಗಿದ್ದರು.", te: "కర్ణాటక సంగీత పితామహుడు. మొదట వ్యాపారి." },
+                work: { en: "Dasa Sahitya", hi: "दास साहित्य", kn: "ದಾಸ ಸಾಹಿತ್ಯ", te: "దాస సాహిత్యం" },
+                impact: { en: "Systematized music teaching.", hi: "संगीत शिक्षण।", kn: "ಸಂಗೀತ ಕಲಿಕೆ.", te: "సంగీత బోధన." },
+                fact: { en: "Created the basic lessons (Sarali Varisai).", hi: "बुनियादी संगीत पाठ।", kn: "ಸರಳೀ ವರಸೆಗಳನ್ನು ರಚಿಸಿದರು.", te: "సరళీ వరసలను రూపొందించారు." },
+                dyk: { en: "Gave away all wealth after a miracle.", hi: "एक चमत्कार के बाद धन त्याग दिया।", kn: "ಪವಾಡದ ನಂತರ ಆಸ್ತಿ ದಾನ ಮಾಡಿದರು.", te: "ఒక అద్భుతం తర్వాత సంపదను త్యజించారు." }
+            },
+            'nammalvar': {
+                name: { en: 'Nammalvar', hi: 'नम्मालवार', kn: 'ನಮ್ಮಾಳ್ವಾರ್', te: 'నమ్మాళ్వార్' },
+                bio: { en: "Spent 16 years in meditation in a hollow tree without speaking.", hi: "16 साल तक एक पेड़ के अंदर मौन तपस्या की।", kn: "16 ವರ್ಷ ಮರದ ಪೊಟರೆಯಲ್ಲಿ ಧ್ಯಾನ ಮಾಡಿದರು.", te: "16 ఏళ్లు చెట్టు తొర్రలో ధ్యానం చేశారు." },
+                work: { en: "Tiruvaymoli", hi: "तिरुवायमोली", kn: "ತಿರುವಾಯ್ಮೊಳಿ", te: "తిరువాయ్ మొళి" },
+                impact: { en: "Works called Tamil Veda.", hi: "तमिल वेद।", kn: "ತಮಿಳು ವೇದ.", te: "తమిళ వేదం." },
+                fact: { en: "Chief of the Alvars.", hi: "आलवारों के प्रमुख।", kn: "ಆಳ್ವಾರರಲ್ಲಿ ಪ್ರಮುಖರು.", te: "ఆళ్వార్లలో ముఖ్యులు." },
+                dyk: { en: "Never opened his eyes to the world.", hi: "दुनिया के लिए कभी आँखें नहीं खोलीं।", kn: "ಲೌಕಿಕ ಜಗತ್ತಿಗೆ ಕಣ್ಣು ತೆರೆಯಲಿಲ್ಲ.", te: "ప్రపంచాన్ని చూడటానికి కళ్లు తెరవలేదు." }
+            },
+            'appar': {
+                name: { en: 'Appar', hi: 'अप्पर', kn: 'ಅಪ್ಪರ್', te: 'అప్పర్' },
+                bio: { en: "Served Shiva by cleaning temples. Converted the Pallava King to Shaivism.", hi: "मंदिरों की सफाई करके शिव की सेवा की।", kn: "ದೇವಾಲಯ ಸ್ವಚ್ಛಗೊಳಿಸುವ ಮೂಲಕ ಸೇವೆ ಮಾಡಿದರು.", te: "ఆలయాలను శుభ్రం చేస్తూ సేవ చేశారు." },
+                work: { en: "Tevaram", hi: "तेवरम", kn: "ತೇವರಂ", te: "తేవరం" },
+                impact: { en: "Revival of Shaivism.", hi: "शैव धर्म का पुनरुत्थान।", kn: "ಶೈವ ಧರ್ಮದ ಪುನರುಜ್ಜೀವನ.", te: "శైవ మత పునరుద్ధరణ." },
+                fact: { en: "Floated on stone in the sea.", hi: "पत्थर पर तैर गए।", kn: "ಕಲ್ಲಿನ ಮೇಲೆ ತೇಲಿದರು.", te: "రాతిపై తేలారు." },
+                dyk: { en: "Called 'Navukkarasar' (King of Tongues/Words).", hi: "वाकपति कहा जाता है।", kn: "ನಾವುಕ್ಕರಸರ್ ಎಂದು ಕರೆಯುತ್ತಾರೆ.", te: "నావుక్కరసర్ అని పిలుస్తారు." }
+            },
+            'kanaka': {
+                name: { en: 'Kanaka Dasa', hi: 'कनक दास', kn: 'ಕನಕ ದಾಸ', te: 'కనక దాసు' },
+                bio: { en: "Soldier turned saint. Proved devotion is above caste.", hi: "सैनिक से संत बने।", kn: "ಸೈನಿಕನಾಗಿದ್ದು ಸಂತನಾದರು.", te: "సైనికుడిగా ఉండి సంతుగా మారారు." },
+                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీర్తనలు" },
+                impact: { en: "Social equality.", hi: "सामाजिक समानता।", kn: "ಸಾಮಾಜಿಕ ಸಮಾನತೆ.", te: "సామాజిక సమానత్వం." },
+                fact: { en: "Idol turned to give him Darshan.", hi: "मूर्ति ने मुड़कर दर्शन दिए।", kn: "ವಿಗ್ರಹವೇ ತಿರುಗಿ ದರ್ಶನ ನೀಡಿತು.", te: "విగ్రహమే తిరిగి దర్శనమిచ్చింది." },
+                dyk: { en: "The window 'Kanakana Kindi' still exists.", hi: "कनकन खिंडी आज भी है।", kn: "ಕನಕನ ಕಿಂಡಿ ಇಂದಿಗೂ ಇದೆ.", te: "కనకన కిండి ఇప్పటికీ ఉంది." }
+            },
+            'ramadasu': {
+                name: { en: 'Ramadasu', hi: 'रामदास', kn: 'ರಾಮದಾಸ', te: 'రామదాసు' },
+                bio: { en: "Built Bhadrachalam temple using tax money. Jailed for 12 years.", hi: "कर के पैसों से मंदिर बनवाया। 12 साल जेल में रहे।", kn: "ತೆರಿಗೆ ಹಣದಲ್ಲಿ ದೇವಾಲಯ ಕಟ್ಟಿದರು. 12 ವರ್ಷ ಜೈಲುವಾಸ.", te: "పన్ను డబ్బుతో గుడి కట్టారు. 12 ఏళ్లు జైలు శిక్ష." },
+                work: { en: "Kirtanas", hi: "कीर्तन", kn: "ಕೀರ್ತನೆಗಳು", te: "కీర్తనలు" },
+                impact: { en: "Telugu musical tradition.", hi: "तेलुगु संगीत परंपरा।", kn: "ತೆಲುಗು ಸಂಗೀತ ಪರಂಪರೆ.", te: "తెలుగు సంగీత సంప్రదాయం." },
+                fact: { en: "Rama paid his debt with gold coins.", hi: "राम ने सोने के सिक्कों से कर्ज चुकाया।", kn: "ರಾಮನು ಚಿನ್ನದ ನಾಣ್ಯ ನೀಡಿ ಋಣ ತೀರಿಸಿದನು.", te: "రాముడు బంగారు నాణేలతో అప్పు తీర్చాడు." },
+                dyk: { en: "Carved Rama's image in prison cell.", hi: "जेल में राम का चित्र उकेरा।", kn: "ಜೈಲಿನಲ್ಲಿ ರಾಮನ ಚಿತ್ರ ಬಿಡಿಸಿದರು.", te: "జైలులో రాముడి బొమ్మ చెక్కారు." }
+            },
+            'annamayya': {
+                name: { en: 'Annamacharya', hi: 'अन्नमाचार्य', kn: 'ಅನ್ನಮಾಚಾರ್ಯ', te: 'అన్నమాచార్య' },
+                bio: { en: "First Telugu poet composer. Wrote 32,000 songs for Venkateswara.", hi: "वेंकटेश्वर के लिए 32,000 गीत लिखे।", kn: "ವೆಂಕಟೇಶ್ವರನಿಗಾಗಿ 32,000 ಹಾಡು ಬರೆದರು.", te: "వెంకటేశ్వరునిపై 32,000 పాటలు రాశారు." },
+                work: { en: "Sankirtanas", hi: "संकीर्तन", kn: "ಸಂಕೀರ್ತನೆಗಳು", te: "సంకీర్తనలు" },
+                impact: { en: "Bhakti music.", hi: "भक्ति संगीत।", kn: "ಭಕ್ತಿ ಸಂಗೀತ.", te: "భక్తి సంగీతం." },
+                fact: { en: "Songs found on copper plates.", hi: "तांबे की प्लेटों पर गीत मिले।", kn: "ತಾಮ್ರದ ತಗಡುಗಳಲ್ಲಿ ಹಾಡುಗಳು ಲಭ್ಯ.", te: "రాగి రేకులపై పాటలు లభించాయి." },
+                dyk: { en: "Considered incarnation of Lord's sword.", hi: "भगवान की तलवार का अवतार।", kn: "ದೇವರ ಖಡ್ಗದ ಅವತಾರ.", te: "స్వామి ఖడ్గ అవతారంగా భావిస్తారు." }
+            },
+            'potana': {
+                name: { en: 'Bammera Potana', hi: 'पोतना', kn: 'ಪೋತನ', te: 'పోతన' },
+                bio: { en: "Farmer poet who translated Bhagavatam to Telugu.", hi: "किसान कवि जिन्होंने भागवत का अनुवाद किया।", kn: "ಭಾಗವತವನ್ನು ಅನುವಾದಿಸಿದ ಕವಿ.", te: "భాగవతాన్ని అనువదించిన రైతు కవి." },
+                work: { en: "Andhra Bhagavatam", hi: "आंध्र भागवतम्", kn: "ಆಂಧ್ರ ಭಾಗವತಂ", te: "ఆంధ్ర భాగవతం" },
+                impact: { en: "Natural poetry (Sahaja Kavi).", hi: "सहज कवि।", kn: "ಸಹಜ ಕವಿ.", te: "సహజ కవి." },
+                fact: { en: "Refused to dedicate book to King.", hi: "राजा को किताब समर्पित करने से मना किया।", kn: "ರಾಜನಿಗೆ ಕೃತಿ ಅರ್ಪಿಸಲು ನಿರಾಕರಿಸಿದರು.", te: "రాజుకు గ్రంథాన్ని అంకితం ఇవ్వడానికి నిరాకరించారు." },
+                dyk: { en: "Saraswati herself helped him write.", hi: "सरस्वती ने लिखने में मदद की।", kn: "ಸರಸ್ವತಿಯೇ ಬರೆಯಲು ನೆರವಾದಳು.", te: "సరస్వతీ దేవి రాయడానికి సాయం చేసింది." }
+            },
+            'jnaneshwar': {
+                name: { en: 'Jnaneshwar', hi: 'ज्ञानेश्वर', kn: 'ಜ್ಞಾನೇಶ್ವರ', te: 'జ్ఞಾనేశ్వర్' },
+                bio: { en: "Translated Gita to Marathi at age 15. Founder of Varkari sect.", hi: "15 साल की उम्र में गीता का अनुवाद किया।", kn: "15ನೇ ವಯಸ್ಸಿನಲ್ಲಿ ಗೀತೆ ಅನುವಾದಿಸಿದರು.", te: "15 ఏళ్లకే గీతను అనువదించారు." },
+                work: { en: "Jnaneshwari", hi: "ज्ञानेश्वरी", kn: "ಜ್ಞಾನೇಶ್ವರಿ", te: "జ్ఞానేశ్వరి" },
+                impact: { en: "Marathi literature.", hi: "मराठी साहित्य।", kn: "ಮರಾಠಿ ಸಾಹಿತ್ಯ.", te: "మరాఠీ సాహిత్యం." },
+                fact: { en: "Took Samadhi at age 21.", hi: "21 साल में समाधि ली।", kn: "21ನೇ ವಯಸ್ಸಿನಲ್ಲಿ ಸಮಾಧಿ.", te: "21 ఏళ్లకే సమాధి తీసుకున్నారు." },
+                dyk: { en: "Made a wall fly.", hi: "दीवार को हवा में उड़ाया।", kn: "ಗೋಡೆ ಹಾರುವಂತೆ ಮಾಡಿದರು.", te: "గోడను గాలిలో ఎగిరేలా చేశారు." }
+            },
+            'namdev': {
+                name: { en: 'Namdev', hi: 'नामदेव', kn: 'ನಾಮದೇವ', te: 'నామదేవ్' },
+                bio: { en: "Tailor saint. His songs are in Guru Granth Sahib.", hi: "दर्जी संत। गुरु ग्रंथ साहिब में उनके गीत हैं।", kn: "ಸಿಂಪಿಗ ಸಂತ. ಗುರು ಗ್ರಂಥ ಸಾಹೀಬದಲ್ಲಿ ಇವರ ಹಾಡುಗಳಿವೆ.", te: "దర్జీ సంతు. గురు గ్రంథ సాహిబ్ లో వీరి పాటలు ఉన్నాయి." },
+                work: { en: "Abhangas", hi: "अभंग", kn: "ಅಭಂಗಗಳು", te: "అభంగాలు" },
+                impact: { en: "Bridge between North and South Bhakti.", hi: "उत्तर-दक्षिण भक्ति सेतु।", kn: "ಉತ್ತರ-ದಕ್ಷಿಣ ಭಕ್ತಿ ಸೇತುವೆ.", te: "ఉత్తర-దక్షిణ భక్తి వారధి." },
+                fact: { en: "Ate with Vithoba.", hi: "विठोबा के साथ भोजन किया।", kn: "ವಿಠ್ಠಲನ ಜೊತೆ ಊಟ ಮಾಡಿದರು.", te: "విఠలుడితో కలిసి భోజనం చేశారు." },
+                dyk: { en: "Ran after a dog to serve it ghee.", hi: "कुत्ते को घी देने के लिए पीछे भागे।", kn: "ನಾಯಿಗೆ ತುಪ್ಪ ನೀಡಲು ಹಿಂದೆಯೇ ಓಡಿದರು.", te: "కుక్కకు నెయ్యి వేయడానికి దాని వెనుక పరిగెత్తారు." }
+            },
+            'tukaram': {
+                name: { en: 'Tukaram', hi: 'तुकाराम', kn: 'ತುಕಾರಾಂ', te: 'తుకారాం' },
+                bio: { en: "Grocer saint. His Abhangas defined Marathi culture.", hi: "दुकानदार संत। उनके अभंग प्रसिद्ध हैं।", kn: "ವ್ಯಾಪಾರಿ ಸಂತ. ಇವರ ಅಭಂಗಗಳು ಪ್ರಸಿದ್ಧ.", te: "వ్యాపారి సంతు. వీరి అభంగాలు ప్రసిద్ధి." },
+                work: { en: "Abhangas", hi: "अभंग", kn: "ಅಭಂಗಗಳು", te: "అభంగాలు" },
+                impact: { en: "Varkari tradition.", hi: "वारकरी परंपरा।", kn: "ವಾರ್ಕರಿ ಸಂಪ್ರದಾಯ.", te: "వార్కరీ సంప్రదాయం." },
+                fact: { en: "Ascended to heaven bodily.", hi: "सदेह स्वर्ग गए।", kn: "ಸದೇಹವಾಗಿ ಸ್ವರ್ಗಕ್ಕೆ ಹೋದರು.", te: "సదేహంగా స్వర్గానికి వెళ్లారు." },
+                dyk: { en: "Birds sat on him while he meditated.", hi: "ध्यान करते समय पक्षी उन पर बैठते थे।", kn: "ಧ್ಯಾನ ಮಾಡುವಾಗ ಪಕ್ಷಿಗಳು ಇವರ ಮೇಲೆ ಕುಳಿತುಕೊಳ್ಳುತ್ತಿದ್ದವು.", te: "ధ్యానం చేస్తున్నప్పుడు పక్షులు ఆయనపై వాలేవి." }
+            },
+            'eknath': {
+                name: { en: 'Eknath', hi: 'एकनाथ', kn: 'ಏಕನಾಥ', te: 'ఏకనాథ్' },
+                bio: { en: "Scholar who served the poor and outcastes.", hi: "विद्वान जिन्होंने गरीबों की सेवा की।", kn: "ಬಡವರ ಸೇವೆ ಮಾಡಿದ ವಿದ್ವಾಂಸ.", te: "పేదలకు సేవ చేసిన పండితుడు." },
+                work: { en: "Bhagavata", hi: "भागवत", kn: "ಭಾಗವತ", te: "భాగవతం" },
+                impact: { en: "Communal harmony.", hi: "साम्प्रदायिक सद्भाव।", kn: "ಸಾಮುದಾಯಿಕ ಸಾಮರಸ್ಯ.", te: "సామాజిక సామరస్యం." },
+                fact: { en: "Gave holy water to a donkey.", hi: "गधे को गंगाजल दिया।", kn: "ಕತ್ತೆಗೆ ಗಂಗಾಜಲ ನೀಡಿದರು.", te: "గాడిదకు గంగాజలం ఇచ్చారు." },
+                dyk: { en: "Restarted pilgrim meals.", hi: "तीर्थयात्री भोजन फिर शुरू किया।", kn: "ಯಾತ್ರಿಕರಿಗೆ ಊಟದ ವ್ಯವಸ್ಥೆ ಮಾಡಿದರು.", te: "యాత్రికులకు అన్నదానం పునరుద్ధరించారు." }
+            },
+            'ramdas': {
+                name: { en: 'Ramdas', hi: 'रामदास', kn: 'ರಾಮದಾಸ್', te: 'రామదాసు' },
+                bio: { en: "Guru of Shivaji. Preached strength and devotion.", hi: "शिवाजी के गुरु। शक्ति और भक्ति का उपदेश दिया।", kn: "ಶಿವಾಜಿಯ ಗುರು. ಶಕ್ತಿ ಮತ್ತು ಭಕ್ತಿ ಬೋಧಿಸಿದರು.", te: "శివాజీ గురువు. శక్తి మరియు భక్తిని బోధించారు." },
+                work: { en: "Dasbodh", hi: "दासबोध", kn: "ದಾಸಬೋಧ", te: "దాసబోధ" },
+                impact: { en: "Built 1100 Hanuman temples.", hi: "1100 हनुमान मंदिर बनवाए।", kn: "1100 ಹನುಮಾನ್ ದೇವಾಲಯ ಕಟ್ಟಿದರು.", te: "1100 హనుమాన్ ఆలయాలు కట్టించారు." },
+                fact: { en: "Revived physical culture.", hi: "शारीरिक संस्कृति को पुनर्जीवित किया।", kn: "ದೈಹಿಕ ಕಸರತ್ತು ಉತ್ತೇಜಿಸಿದರು.", te: "వ్యాయామాన్ని ప్రోత్సహించారు." },
+                dyk: { en: "Wrote entire Dasbodh in a cave.", hi: "गुफा में दासबोध लिखा।", kn: "ಗುಹೆಯಲ್ಲಿ ದಾಸಬೋಧ ಬರೆದರು.", te: "గుహలో దాసబోధ రాశారు." }
+            },
+            'narsinh': {
+                name: { en: 'Narsinh Mehta', hi: 'नरसिंह मेहता', kn: 'ನರಸಿಂಹ ಮೆಹ್ತಾ', te: 'నరసింహ మెహతా' },
+                bio: { en: "Adi Kavi of Gujarat. Wrote 'Vaishnava Jana To'.", hi: "गुजरात के आदिकवि। 'वैष्णव जन तो' लिखा।", kn: "ಗುಜರಾತ್ ಆದಿಕವಿ. 'ವೈಷ್ಣವ ಜನ ತೋ' ರಚಿಸಿದರು.", te: "గుజరాత్ ఆదికవి. 'వైష్ణవ జన తో' రాశారు." },
+                work: { en: "Bhajans", hi: "भजन", kn: "ಭಜನೆಗಳು", te: "భజనలు" },
+                impact: { en: "Gandhi's favorite poet.", hi: "गांधीजी के पसंदीदा कवि।", kn: "ಗಾಂಧೀಜಿಯವರ ಅಚ್ಚುಮೆಚ್ಚಿನ ಕವಿ.", te: "గాంధీజీకి ఇష్టమైన కవి." },
+                fact: { en: "Krishna paid his bills.", hi: "कृष्ण ने उनके बिल चुकाए।", kn: "ಕೃಷ್ಣನೇ ಇವರ ಸಾಲ ತೀರಿಸಿದನು.", te: "కృష్ణుడే ఈయన అప్పులు తీర్చాడు." },
+                dyk: { en: "Daughter's wedding gifts brought by God.", hi: "बेटी की शादी का उपहार भगवान ने दिया।", kn: "ಮಗಳ ಮದುವೆ ಉಡುಗೊರೆ ದೇವರೇ ತಂದರು.", te: "కూతురి పెళ్లి కానుకలు దేవుడే తెచ్చాడు." }
+            },
+            'kabir': {
+                name: { en: 'Kabir', hi: 'कबीर', kn: 'ಕಬೀರ್', te: 'కబీర్' },
+                bio: { en: "Weaver saint. Preached formless God and unity.", hi: "जुलाहा संत। निराकार ईश्वर का उपदेश दिया।", kn: "ನೇಕಾರ ಸಂತ. ನಿರಾಕಾರ ದೇವರನ್ನು ಬೋಧಿಸಿದರು.", te: "నేతకారుడైన సంతు. నిరాకార దేవుడిని బోధించారు." },
+                work: { en: "Bijak", hi: "बीजक", kn: "ಬೀಜಕ", te: "బీజక్" },
+                impact: { en: "Unity of Hindu-Muslim.", hi: "हिंदू-मुस्लिम एकता।", kn: "ಹಿಂದೂ-ಮುಸ್ಲಿಂ ಏಕತೆ.", te: "హిందూ-ముస్లిం ఐక్యత." },
+                fact: { en: "Flowers found instead of body.", hi: "शव की जगह फूल मिले।", kn: "ದೇಹದ ಬದಲು ಹೂವುಗಳು ಸಿಕ್ಕವು.", te: "శవం బదులు పూలు దొరికాయి." },
+                dyk: { en: "Raised by Muslim weavers.", hi: "मुस्लिम जुलाहों ने पाला।", kn: "ಮುಸ್ಲಿಂ ನೇಕಾರರು ಬೆಳೆಸಿದರು.", te: "ముస్లిం నేతకారులు పెంచారు." }
+            },
+            'mirabai': {
+                name: { en: 'Mirabai', hi: 'मीराबाई', kn: 'ಮೀರಾಬಾಯಿ', te: 'మీరాబాయి' },
+                bio: { en: "Princess who became a wandering saint for Krishna.", hi: "राजकुमारी जो कृष्ण के लिए जोगन बन गई।", kn: "ಕೃಷ್ಣನಿಗಾಗಿ ಜೋಗಿಯಾದ ರಾಜಕುಮಾರಿ.", te: "కృష్ణుడి కోసం సన్యాసినిగా మారిన రాజకుమారి." },
+                work: { en: "Bhajans", hi: "भजन", kn: "ಭಜನೆಗಳು", te: "భజనలు" },
+                impact: { en: "Symbol of pure devotion.", hi: "शुद्ध भक्ति का प्रतीक।", kn: "ಶುದ್ಧ ಭಕ್ತಿಯ ಸಂಕೇತ.", te: "స్వచ్ఛమైన భక్తికి ప్రతీక." },
+                fact: { en: "Poison turned to nectar.", hi: "विष अमृत बन गया।", kn: "ವಿಷ ಅಮೃತವಾಯಿತು.", te: "విషం అమృతంగా మారింది." },
+                dyk: { en: "Merged into Krishna's idol.", hi: "कृष्ण की मूर्ति में समा गईं।", kn: "ಕೃಷ್ಣನ ವಿಗ್ರಹದಲ್ಲಿ ಲೀನವಾದರು.", te: "కృష్ణుడి విగ్రహంలో ఐక్యమయ్యారు." }
+            },
+            'tulsidas': {
+                name: { en: 'Tulsidas', hi: 'तुलसीदास', kn: 'ತುಳಸೀದಾಸ', te: 'తులసీదాస్' },
+                bio: { en: "Wrote Ramayana in common language (Hindi).", hi: "रामायण को जनभाषा (हिंदी) में लिखा।", kn: "ರಾಮಾಯಣವನ್ನು ಹಿಂದಿಯಲ್ಲಿ ಬರೆದರು.", te: "రామాయణాన్ని సామాన్య భాషలో రాశారు." },
+                work: { en: "Ramcharitmanas", hi: "रामचरितमानस", kn: "ರಾಮಚರಿತಮಾನಸ", te: "రామచరితమానస్" },
+                impact: { en: "Made Rama accessible to all.", hi: "राम को जन-जन तक पहुँचाया।", kn: "ರಾಮನನ್ನು ಜನಸಾಮಾನ್ಯರಿಗೆ ತಲುಪಿಸಿದರು.", te: "రాముడిని ప్రజలకు చేరువ చేశారు." },
+                fact: { en: "Met Hanuman and Rama.", hi: "हनुमान और राम से मिले।", kn: "ಹನುಮಂತ ಮತ್ತು ರಾಮನನ್ನು ಭೇಟಿಯಾದರು.", te: "హనుమంతుడిని, రాముడిని కలిశారు." },
+                dyk: { en: "Wife's taunt changed his life.", hi: "पत्नी के ताने ने जीवन बदल दिया।", kn: "ಪತ್ನಿಯ ಮಾತು ಬದುಕು ಬದಲಿಸಿತು.", te: "భార్య మాట జీవితాన్ని మార్చేసింది." }
+            },
+            'gurunanak': {
+                name: { en: 'Guru Nanak', hi: 'गुरु नानक', kn: 'ಗುರು ನಾನಕ್', te: 'గురు నానక్' },
+                bio: { en: "Founder of Sikhism. Preached One God.", hi: "सिख धर्म के संस्थापक।", kn: "ಸಿಖ್ ಧರ್ಮದ ಸ್ಥಾಪಕರು.", te: "సిక్కు మత స్థాపకులు." },
+                work: { en: "Japji Sahib", hi: "जपुजी साहिब", kn: "ಜಪುಜಿ ಸಾಹಿಬ್", te: "జపుజీ సాహిబ్" },
+                impact: { en: "Equality and Langar.", hi: "समानता और लंगर।", kn: "ಸಮಾನತೆ ಮತ್ತು ಲಂಗರ್.", te: "సమానత్వం మరియు లంగర్." },
+                fact: { en: "Travelled to Mecca and Tibet.", hi: "मक्का और तिब्बत की यात्रा की।", kn: "ಮೆಕ್ಕಾ ಮತ್ತು ಟಿಬೆಟ್‌ಗೆ ಹೋದರು.", te: "మక్కా, టిబెట్ లకు వెళ్లారు." },
+                dyk: { en: "Said God is everywhere.", hi: "कहा ईश्वर सर्वत्र है।", kn: "ದೇವರು ಎಲ್ಲೆಡೆ ಇದ್ದಾನೆ ಎಂದರು.", te: "దేవుడు అంతటా ఉన్నాడని చెప్పారు." }
+            },
+            'ravidas': {
+                name: { en: 'Ravidas', hi: 'रविदास', kn: 'ರವಿದಾಸ್', te: 'రవిదాసు' },
+                bio: { en: "Cobbler saint. Preached dignity of labor.", hi: "मोची संत। श्रम की गरिमा का उपदेश दिया।", kn: "ಚಮ್ಮಾರ ಸಂತ. ಕಾಯಕದ ಘನತೆ ಸಾರಿದರು.", te: "చర్మకారుడైన సంతు. శ్రమ గౌరవాన్ని చాటారు." },
+                work: { en: "Bhajans", hi: "भजन", kn: "ಭಜನೆಗಳು", te: "భజనలు" },
+                impact: { en: "Equality of castes.", hi: "जाति समानता।", kn: "ಜಾತಿ ಸಮಾನತೆ.", te: "కుల సమానత్వం." },
+                fact: { en: "Ganga appeared in his water tub.", hi: "कठौती में गंगा प्रकट हुईं।", kn: "ನೀರಿನ ತೊಟ್ಟಿಯಲ್ಲಿ ಗಂಗೆ ಪ್ರತ್ಯಕ್ಷ.", te: "నీటి తొట్టిలో గంగ ప్రత్యక్షమైంది." },
+                dyk: { en: "Guru of Mirabai.", hi: "मीराबाई के गुरु।", kn: "ಮೀರಾಬಾಯಿಯ ಗುರು.", te: "మీరాబాయి గురువు." }
+            },
+            'surdas': {
+                name: { en: 'Surdas', hi: 'सूरदास', kn: 'ಸೂರ್‌ದಾಸ್', te: 'సూర్దాస్' },
+                bio: { en: "Blind poet. Described Krishna's childhood vividly.", hi: "नेत्रहीन कवि। कृष्ण बाललीला का वर्णन किया।", kn: "ಅಂಧ ಕವಿ. ಕೃಷ್ಣನ ಬಾಲ್ಯ ವರ್ಣಿಸಿದರು.", te: "అంధ కవి. కృష్ణుడి బాల్యాన్ని వర్ణించారు." },
+                work: { en: "Sur Sagar", hi: "सूर सागर", kn: "ಸೂರ್ ಸಾಗರ್", te: "సూర్ సాగర్" },
+                impact: { en: "Bhakti literature.", hi: "भक्ति साहित्य।", kn: "ಭಕ್ತಿ ಸಾಹಿತ್ಯ.", te: "భక్తి సాహిత్యం." },
+                fact: { en: "Krishna saved him from a well.", hi: "कृष्ण ने कुएं से बचाया।", kn: "ಬಾವಿಯಿಂದ ಕೃಷ್ಣ ರಕ್ಷಿಸಿದನು.", te: "బావి నుండి కృష్ణుడు రక్షించాడు." },
+                dyk: { en: "Wrote 100,000 songs.", hi: "एक लाख गीत लिखे।", kn: "ಒಂದು ಲಕ್ಷ ಹಾಡು ಬರೆದರು.", te: "లక్ష పాటలు రాశారు." }
+            },
+            'gobind': {
+                name: { en: 'Guru Gobind Singh', hi: 'गुरु गोबिंद सिंह', kn: 'ಗುರು ಗೋಬಿಂದ್ ಸಿಂಗ್', te: 'గురు గోవింద్ సింగ్' },
+                bio: { en: "10th Sikh Guru. Created Khalsa Panth.", hi: "10वें सिख गुरु। खालसा पंथ की स्थापना की।", kn: "10ನೇ ಸಿಖ್ ಗುರು. ಖಾಲ್ಸಾ ಪಂಥ ಸ್ಥಾಪಿಸಿದರು.", te: "10వ సిక్కు గురువు. ఖల్సా పంత్ స్థాపించారు." },
+                work: { en: "Dasam Granth", hi: "दसम ग्रंथ", kn: "ದಸಂ ಗ್ರಂಥ", te: "దశమ గ్రంథం" },
+                impact: { en: "Saint-Soldier concept.", hi: "संत-सिपाही अवधारणा।", kn: "ಸಂತ-ಸಿಪಾಯಿ ಪರಿಕಲ್ಪನೆ.", te: "సాధు-సైనికుడు భావన." },
+                fact: { en: "Sacrificed four sons.", hi: "चार पुत्रों का बलिदान दिया।", kn: "ನಾಲ್ವರು ಪುತ್ರರನ್ನು ತ್ಯಾಗ ಮಾಡಿದರು.", te: "నలుగురు కుమారులను త్యాగం చేశారు." },
+                dyk: { en: "Poet and Warrior.", hi: "कवि और योद्धा।", kn: "ಕವಿ ಮತ್ತು ಯೋಧ.", te: "కవి మరియు యోధుడు." }
+            },
+            'chaitanya': {
+                name: { en: 'Chaitanya', hi: 'चैतन्य', kn: 'ಚೈತನ್ಯ', te: 'చైతన్య' },
+                bio: { en: "Avatar of Krishna. Started Sankirtan movement.", hi: "कृष्ण के अवतार। संकीर्तन आंदोलन शुरू किया।", kn: "ಕೃಷ್ಣನ ಅವತಾರ. ಸಂಕೀರ್ತನಾ ಚಳುವಳಿ ಆರಂಭಿಸಿದರು.", te: "కృష్ణుడి అవతారం. సంకీర్తన ఉద్యమం మొదలుపెట్టారు." },
+                work: { en: "Siksastakam", hi: "शिक्षाष्टकम", kn: "ಶಿಕ್ಷಾಷ್ಟಕಂ", te: "శిక్షాష్టకం" },
+                impact: { en: "Gaudiya Vaishnavism.", hi: "गौड़ीय वैष्णववाद।", kn: "ಗೌಡೀಯ ವೈಷ್ಣವ ಪಂಥ.", te: "గౌడీయ వైష్ణవం." },
+                fact: { en: "Popularized Hare Krishna Mantra.", hi: "हरे कृष्ण मंत्र लोकप्रिय किया।", kn: "ಹರೇ ಕೃಷ್ಣ ಮಂತ್ರ ಪ್ರಚಾರ ಮಾಡಿದರು.", te: "హరే కృష్ణ మంత్రాన్ని ప్రాచుర్యంలోకి తెచ్చారు." },
+                dyk: { en: "Fainted in ecstasy often.", hi: "अक्सर समाधि में लीन हो जाते थे।", kn: "ಭಕ್ತಿಯ ಪಾರವಶ್ಯದಲ್ಲಿ ಎಚ್ಚರ ತಪ್ಪುತ್ತಿದ್ದರು.", te: "భక్తి పారవశ్యంలో స్పృహ కోల్పోయేవారు." }
+            },
+            'sankardev': {
+                name: { en: 'Sankardev', hi: 'शंकरदेव', kn: 'ಶಂಕರದೇವ', te: 'శంకరదేవ్' },
+                bio: { en: "Assamese polymath. Used art for devotion.", hi: "असमिया बहुश्रुत। भक्ति के लिए कला का उपयोग किया।", kn: "ಅಸ್ಸಾಮಿ ಸಂತ. ಭಕ್ತಿಗಾಗಿ ಕಲೆ ಬಳಸಿದರು.", te: "అస్సామీ పండితుడు. భక్తి కోసం కళను వాడారు." },
+                work: { en: "Kirtan Ghosa", hi: "कीर्तन घोषा", kn: "ಕೀರ್ತನ ಘೋಷಾ", te: "కీర్తన ఘోష" },
+                impact: { en: "Sattriya Dance.", hi: "सत्रिया नृत्य।", kn: "ಸತ್ರಿಯಾ ನೃತ್ಯ.", te: "సತ్రియ నృత్యం." },
+                fact: { en: "Established Satras.", hi: "सत्रों की स्थापना की।", kn: "ಸತ್ರಗಳನ್ನು ಸ್ಥಾಪಿಸಿದರು.", te: "సత్రాలను స్థాపించారు." },
+                dyk: { en: "Wrote plays (Ankiya Nat).", hi: "नाटक (अंकिया नट) लिखे।", kn: "ಅಂಕಿಯ ನಾಟ್ ನಾಟಕ ಬರೆದರು.", te: "అంకియ నాట్ నాటకాలు రాశారు." }
+            },
+            'jayadeva': {
+                name: { en: 'Jayadeva', hi: 'जयदेव', kn: 'ಜಯದೇವ', te: 'జయదేవ' },
+                bio: { en: "Sanskrit poet. Wrote Gita Govinda.", hi: "संस्कृत कवि। गीत गोविंद लिखा।", kn: "ಸಂಸ್ಕೃತ ಕವಿ. ಗೀತ ಗೋವಿಂದ ರಚಿಸಿದರು.", te: "సంస్కృత కవి. గీత గోవిందం రాశారు." },
+                work: { en: "Gita Govinda", hi: "गीत गोविंद", kn: "ಗೀತ ಗೋವಿಂದ", te: "గీత గోవిందం" },
+                impact: { en: "Odissi Dance music.", hi: "ओडिसी संगीत।", kn: "ಒಡಿಸ್ಸಿ ಸಂಗೀತ.", te: "ఒడిస్సీ సంగీతం." },
+                fact: { en: "Krishna completed his verse.", hi: "कृष्ण ने उनका श्लोक पूरा किया।", kn: "ಕೃಷ್ಣನೇ ಇವರ ಶ್ಲೋಕ ಪೂರ್ಣಗೊಳಿಸಿದನು.", te: "కృష్ణుడే వీరి శ్లోకాన్ని పూర్తి చేశాడు." },
+                dyk: { en: "His wife Padmavati was a dancer.", hi: "पत्नी पद्मावती नर्तकी थीं।", kn: "ಪತ್ನಿ ಪದ್ಮಾವತಿ ನೃತ್ಯಗಾರ್ತಿಯಾಗಿದ್ದರು.", te: "భార్య పద్మావತಿ నర్తకి." }
+            },
+            'vidyapati': {
+                name: { en: 'Vidyapati', hi: 'विद्यापति', kn: 'ವಿದ್ಯಾಪತಿ', te: 'విద్యాపతి' },
+                bio: { en: "Maithili poet. Sang of Radha-Krishna.", hi: "मैथिली कवि। राधा-कृष्ण के गीत गाए।", kn: "ಮೈಥಿಲಿ ಕವಿ. ರಾಧಾ-ಕೃಷ್ಣರ ಬಗ್ಗೆ ಹಾಡಿದರು.", te: "మైథిలి కవి. రాధా-కృష్ణుల గురించి పాడారు." },
+                work: { en: "Padavali", hi: "पदावली", kn: "ಪದಾವಳಿ", te: "పదావళి" },
+                impact: { en: "Bengali literature.", hi: "बंगाली साहित्य।", kn: "ಬಂಗಾಳಿ ಸಾಹಿತ್ಯ.", te: "బెంగాలీ సాహిత్యం." },
+                fact: { en: "Shiva served him as a servant.", hi: "शिव ने सेवक बनकर सेवा की।", kn: "ಶಿವನೇ ಸೇವಕನಾಗಿ ದುಡಿದನು.", te: "శివుడే సేవకుడిగా పనిచేశాడు." },
+                dyk: { en: "Known as Maithil Kokil.", hi: "मैथिल कोकिल कहा जाता है।", kn: "ಮೈಥಿಲ್ ಕೋಗಿಲೆ ಎಂದು ಕರೆಯುತ್ತಾರೆ.", te: "మైథిల్ కోకిల అని పిలుస్తారు." }
+            },
+            'lalded': {
+                name: { en: 'Lal Ded', hi: 'लल डेड', kn: 'ಲಲ್ ಡೇಡ್', te: 'లల్ దేడ్' },
+                bio: { en: "Kashmiri mystic. Preached Shaivism.", hi: "कश्मीरी कवयित्री। शैव धर्म का प्रचार किया।", kn: "ಕಾಶ್ಮೀರಿ ಯೋಗಿನಿ. ಶೈವ ಧರ್ಮ ಬೋಧಿಸಿದರು.", te: "కాశ్మీరీ యోగిని. శైవ మతం బోధించారు." },
+                work: { en: "Vakhs", hi: "वाख", kn: "ವಾಖ್", te: "వాఖ్" },
+                impact: { en: "Kashmiri culture.", hi: "कश्मीरी संस्कृति।", kn: "ಕಾಶ್ಮೀರಿ ಸಂಸ್ಕೃತಿ.", te: "కాశ్మీరీ సంస్కృతి." },
+                fact: { en: "Roamed naked like Akka Mahadevi.", hi: "अक्का महादेवी की तरह वस्त्रहीन रहीं।", kn: "ಅಕ್ಕ ಮಹಾದೇವಿಯಂತೆ ದಿಗಂಬರೆಯಾಗಿದ್ದರು.", te: "అక్క మహాదేవిలా వస్త్రాలు విడిచిపెట్టారు." },
+                dyk: { en: "Revered by Hindus and Muslims.", hi: "हिंदू और मुस्लिम दोनों मानते हैं।", kn: "ಹಿಂದೂ ಮತ್ತು ಮುಸ್ಲಿಮರು ಗೌರವಿಸುತ್ತಾರೆ.", te: "హిందువులు, ముస్లింలు ఇద్దరూ గౌరవిస్తారు." }
+            }
+        };
+
+        // --- 4. NAVIGATION LOGIC ---
+        function startJourney(lang) {
+            currentLang = lang;
+            document.body.className = 'lang-' + lang;
+            
+            // Translate Text
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) el.innerHTML = i18n[lang][key];
+            });
+
+            document.getElementById('lang-gateway').classList.add('hidden');
+            document.getElementById('chapter-1').classList.remove('hidden');
+            document.getElementById('chapter-1').classList.add('fade-in');
+        }
+
+        function enterMap() {
+            document.getElementById('chapter-1').classList.add('hidden');
+            document.getElementById('chapter-2').classList.remove('hidden');
+            document.getElementById('chapter-2').classList.add('fade-in');
+            
+            // Initialize Map
+            setTimeout(() => {
+                if(!map) initMap();
+                map.invalidateSize();
+                
+                // MOBILE ZOOM FIX:
+                // If width is small (phone), use fitBounds to show whole India
+                if(window.innerWidth <= 768) {
+                    map.fitBounds([
+                        [6.5, 68], // Southwest
+                        [35.5, 97] // Northeast
+                    ]);
+                }
+            }, 300);
+        }
+
+        function exitMap() {
+            document.getElementById('chapter-2').classList.add('hidden');
+            document.getElementById('chapter-3').classList.remove('hidden');
+            document.getElementById('chapter-3').classList.add('fade-in');
+            window.scrollTo(0,0);
+        }
+
+        // --- 5. MAP LOGIC ---
+        function getSafeText(id, field) {
+            if (saintDetails[id]) {
+                if(saintDetails[id][field]) {
+                    return saintDetails[id][field][currentLang] || saintDetails[id][field]['en'] || '';
+                }
+                return i18n[currentLang][`label_${field}`] || ''; 
+            }
+            return ''; 
+        }
+
+        function initMap() {
+            map = L.map('map').setView([21.5, 79.0], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            saintsData.forEach(saint => {
+                let name = '';
+                if(saintDetails[saint.id] && saintDetails[saint.id].name) {
+                    name = saintDetails[saint.id].name[currentLang] || saintDetails[saint.id].name['en'];
+                } else {
+                    name = saint.id; 
+                }
+
+                const icon = L.divIcon({
+                    className: 'custom-icon',
+                    html: `<div class="marker-box"><div class="saint-dot"></div><span class="perm-label">${name}</span></div>`,
+                    iconSize: [100, 40], iconAnchor: [50, 20]
+                });
+
+                const m = L.marker(saint.coords, {icon: icon}).addTo(map);
+                m.saintId = saint.id;
+                m.era = saint.era;
+                m.on('click', () => {
+                    updateSidebar(saint.id, saint.era);
+                    map.flyTo(saint.coords, 6);
+                });
+                markers.push(m);
+            });
+        }
+
+        function updateSidebar(id, era) {
+            const name = getSafeText(id, 'name');
+            const bio = getSafeText(id, 'bio');
+            const work = getSafeText(id, 'work');
+            const impact = getSafeText(id, 'impact');
+            const fact = getSafeText(id, 'fact');
+            const dyk = getSafeText(id, 'dyk');
+            
+            const l_c = i18n[currentLang]['label_contribution'];
+            const l_i = i18n[currentLang]['label_impact'];
+            const l_f = i18n[currentLang]['label_fact'];
+
+            let html = `
+                <div class="info-header">
+                    <h1>${name}</h1>
+                    <span>${era} | Bharat</span>
+                </div>
+                <div class="bio-text">${bio}</div>
+                
+                <span class="label-head">${l_c}</span>
+                <div>${work}</div>
+                
+                <span class="label-head">${l_i}</span>
+                <div>${impact}</div>
+                
+                <div class="highlight-box"><strong>${l_f}:</strong> ${fact}</div>
+            `;
+            
+            if(dyk) html += `<div class="dyk-box"><strong>Did You Know?</strong> ${dyk}</div>`;
+            
+            document.getElementById('info-panel').innerHTML = html;
+        }
+
+        function searchSaint() {
+            const val = document.getElementById('search-box').value.toLowerCase();
+            markers.forEach(m => {
+                let n = '';
+                if(saintDetails[m.saintId]) n = saintDetails[m.saintId].name['en'].toLowerCase();
+                let nLoc = '';
+                if(saintDetails[m.saintId] && saintDetails[m.saintId].name[currentLang]) {
+                    nLoc = saintDetails[m.saintId].name[currentLang].toLowerCase();
+                }
+
+                if(n.includes(val) || nLoc.includes(val)) {
+                    m.getElement().style.display = "block";
+                } else {
+                    m.getElement().style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
